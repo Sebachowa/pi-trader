@@ -1,0 +1,247 @@
+{
+  "market_evaluation_framework": {
+    "version": "1.0.0",
+    "description": "Comprehensive market evaluation framework for 2-week paper trading challenge",
+    "last_updated": "2025-07-01",
+    
+    "crypto_markets": {
+      "btc_evaluation": {
+        "instruments": ["BTCUSDT-PERP", "BTCUSDT-SPOT", "BTCUSD-PERP"],
+        "venues": ["BINANCE", "BYBIT", "COINBASE", "DYDX"],
+        "scoring_criteria": {
+          "liquidity_score": {
+            "weight": 0.25,
+            "metrics": ["bid_ask_spread", "market_depth", "volume_24h", "order_book_imbalance"]
+          },
+          "volatility_score": {
+            "weight": 0.20,
+            "metrics": ["atr_ratio", "historical_volatility", "intraday_range", "volume_spikes"]
+          },
+          "trend_score": {
+            "weight": 0.20,
+            "metrics": ["trend_strength", "momentum_indicators", "support_resistance_levels"]
+          },
+          "fee_structure": {
+            "weight": 0.15,
+            "metrics": ["maker_fee", "taker_fee", "funding_rate", "slippage_estimate"]
+          },
+          "technical_setup": {
+            "weight": 0.20,
+            "metrics": ["pattern_recognition", "indicator_alignment", "market_regime"]
+          }
+        },
+        "minimum_requirements": {
+          "min_daily_volume_usd": 1000000000,
+          "max_spread_bps": 5,
+          "min_market_depth_usd": 1000000,
+          "max_funding_rate_8h": 0.01
+        }
+      },
+      
+      "eth_evaluation": {
+        "instruments": ["ETHUSDT-PERP", "ETHUSDT-SPOT", "ETHUSD-PERP"],
+        "venues": ["BINANCE", "BYBIT", "COINBASE", "DYDX"],
+        "scoring_criteria": {
+          "liquidity_score": {"weight": 0.25},
+          "volatility_score": {"weight": 0.20},
+          "correlation_to_btc": {"weight": 0.15},
+          "defi_activity": {"weight": 0.20},
+          "technical_setup": {"weight": 0.20}
+        },
+        "minimum_requirements": {
+          "min_daily_volume_usd": 500000000,
+          "max_spread_bps": 5,
+          "min_market_depth_usd": 500000
+        }
+      },
+      
+      "altcoin_evaluation": {
+        "top_tier": ["BNBUSDT", "SOLUSDT", "ADAUSDT", "AVAXUSDT", "DOTUSDT"],
+        "mid_tier": ["MATICUSDT", "LINKUSDT", "UNIUSDT", "AAVEUSDT", "ATOMUSDT"],
+        "meme_coins": ["DOGEUSDT", "SHIBUSDT", "PEPEUSDT"],
+        "scoring_criteria": {
+          "liquidity_score": {"weight": 0.30},
+          "volatility_opportunity": {"weight": 0.25},
+          "news_sentiment": {"weight": 0.15},
+          "technical_setup": {"weight": 0.20},
+          "risk_reward": {"weight": 0.10}
+        },
+        "minimum_requirements": {
+          "min_daily_volume_usd": 50000000,
+          "max_spread_bps": 10,
+          "min_market_cap_usd": 100000000
+        }
+      }
+    },
+    
+    "stock_markets": {
+      "us_equities": {
+        "mega_caps": ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "TSLA"],
+        "large_caps": ["JPM", "JNJ", "V", "WMT", "PG", "MA", "HD", "DIS"],
+        "etfs": ["SPY", "QQQ", "IWM", "DIA", "VOO", "VTI", "ARKK", "XLF"],
+        "sectors": {
+          "technology": ["AAPL", "MSFT", "NVDA", "INTC", "AMD", "CRM"],
+          "financials": ["JPM", "BAC", "GS", "MS", "WFC", "C"],
+          "healthcare": ["JNJ", "UNH", "PFE", "ABBV", "TMO", "MRK"],
+          "consumer": ["AMZN", "TSLA", "HD", "MCD", "NKE", "SBUX"],
+          "energy": ["XOM", "CVX", "COP", "SLB", "EOG", "PSX"]
+        },
+        "scoring_criteria": {
+          "liquidity_score": {
+            "weight": 0.20,
+            "metrics": ["average_daily_volume", "bid_ask_spread", "market_cap"]
+          },
+          "volatility_score": {
+            "weight": 0.20,
+            "metrics": ["beta", "implied_volatility", "historical_volatility"]
+          },
+          "fundamental_score": {
+            "weight": 0.25,
+            "metrics": ["pe_ratio", "earnings_growth", "revenue_growth", "analyst_rating"]
+          },
+          "technical_score": {
+            "weight": 0.20,
+            "metrics": ["relative_strength", "moving_average_alignment", "volume_patterns"]
+          },
+          "news_catalyst": {
+            "weight": 0.15,
+            "metrics": ["earnings_date", "news_sentiment", "insider_activity"]
+          }
+        }
+      },
+      
+      "international_equities": {
+        "european": ["ASML", "SAP", "NESN", "ROG", "MC", "SAN"],
+        "asian": ["TSM", "BABA", "TCEHY", "JD", "SONY", "SHOP"],
+        "emerging": ["VALE", "ITUB", "INFY", "WIT", "IBN"],
+        "scoring_criteria": {
+          "liquidity_score": {"weight": 0.25},
+          "currency_risk": {"weight": 0.20},
+          "geopolitical_risk": {"weight": 0.15},
+          "growth_potential": {"weight": 0.25},
+          "technical_setup": {"weight": 0.15}
+        }
+      }
+    },
+    
+    "forex_markets": {
+      "major_pairs": {
+        "instruments": ["EUR/USD", "GBP/USD", "USD/JPY", "USD/CHF", "AUD/USD", "USD/CAD", "NZD/USD"],
+        "scoring_criteria": {
+          "liquidity_score": {
+            "weight": 0.25,
+            "metrics": ["daily_volume", "spread", "market_hours_activity"]
+          },
+          "volatility_score": {
+            "weight": 0.20,
+            "metrics": ["average_daily_range", "news_impact", "session_overlap"]
+          },
+          "carry_trade_score": {
+            "weight": 0.15,
+            "metrics": ["interest_rate_differential", "rollover_costs"]
+          },
+          "technical_score": {
+            "weight": 0.25,
+            "metrics": ["trend_clarity", "support_resistance", "pattern_formation"]
+          },
+          "fundamental_score": {
+            "weight": 0.15,
+            "metrics": ["economic_calendar", "central_bank_policy", "risk_sentiment"]
+          }
+        }
+      },
+      
+      "cross_pairs": {
+        "instruments": ["EUR/GBP", "EUR/JPY", "GBP/JPY", "AUD/JPY", "EUR/AUD", "GBP/CHF"],
+        "scoring_criteria": {
+          "correlation_opportunities": {"weight": 0.30},
+          "volatility_premium": {"weight": 0.25},
+          "technical_setup": {"weight": 0.25},
+          "spread_cost": {"weight": 0.20}
+        }
+      },
+      
+      "exotic_pairs": {
+        "instruments": ["USD/SGD", "USD/ZAR", "USD/MXN", "USD/TRY", "USD/BRL"],
+        "scoring_criteria": {
+          "risk_premium": {"weight": 0.35},
+          "liquidity_windows": {"weight": 0.30},
+          "event_risk": {"weight": 0.20},
+          "technical_viability": {"weight": 0.15}
+        }
+      }
+    },
+    
+    "commodities_futures": {
+      "precious_metals": {
+        "instruments": ["XAUUSD", "XAGUSD", "XPTUSD", "XPDUSD"],
+        "futures": ["GC", "SI", "PL", "PA"],
+        "scoring_criteria": {
+          "safe_haven_demand": {"weight": 0.25},
+          "inflation_hedge": {"weight": 0.20},
+          "technical_setup": {"weight": 0.25},
+          "dollar_correlation": {"weight": 0.15},
+          "volatility_opportunity": {"weight": 0.15}
+        }
+      },
+      
+      "energy": {
+        "instruments": ["CL", "NG", "RB", "HO"],
+        "scoring_criteria": {
+          "seasonal_patterns": {"weight": 0.25},
+          "geopolitical_risk": {"weight": 0.20},
+          "inventory_data": {"weight": 0.20},
+          "technical_levels": {"weight": 0.20},
+          "volatility_premium": {"weight": 0.15}
+        }
+      },
+      
+      "agricultural": {
+        "instruments": ["ZC", "ZS", "ZW", "KC", "SB", "CC"],
+        "scoring_criteria": {
+          "weather_impact": {"weight": 0.30},
+          "seasonal_trends": {"weight": 0.25},
+          "supply_demand": {"weight": 0.20},
+          "technical_setup": {"weight": 0.25}
+        }
+      }
+    },
+    
+    "market_selection_algorithm": {
+      "daily_evaluation_steps": [
+        {
+          "step": 1,
+          "action": "scan_all_markets",
+          "criteria": "liquidity_and_volatility_threshold"
+        },
+        {
+          "step": 2,
+          "action": "apply_scoring_matrix",
+          "output": "ranked_opportunities"
+        },
+        {
+          "step": 3,
+          "action": "filter_by_correlation",
+          "max_correlation": 0.7
+        },
+        {
+          "step": 4,
+          "action": "apply_risk_constraints",
+          "constraints": ["position_limits", "sector_exposure", "volatility_budget"]
+        },
+        {
+          "step": 5,
+          "action": "generate_final_selection",
+          "output": "top_10_opportunities"
+        }
+      ],
+      
+      "real_time_adjustments": {
+        "news_impact_filter": true,
+        "volatility_spike_detection": true,
+        "liquidity_monitoring": true,
+        "correlation_tracking": true
+      }
+    }
+  }
+}

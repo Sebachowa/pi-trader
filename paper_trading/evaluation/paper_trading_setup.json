@@ -1,0 +1,305 @@
+{
+  "paper_trading_setup": {
+    "version": "1.0.0",
+    "description": "Enhanced Nautilus paper trading environment configuration",
+    
+    "data_feed_configuration": {
+      "crypto_feeds": {
+        "binance": {
+          "testnet": true,
+          "websocket_streams": [
+            "trade", "bookTicker", "depth20", "aggTrade", "kline_1m"
+          ],
+          "instruments": [
+            "BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "ADAUSDT",
+            "AVAXUSDT", "DOTUSDT", "MATICUSDT", "LINKUSDT", "UNIUSDT"
+          ],
+          "perpetuals": [
+            "BTCUSDT-PERP", "ETHUSDT-PERP", "BNBUSDT-PERP", "SOLUSDT-PERP"
+          ]
+        },
+        
+        "bybit": {
+          "testnet": true,
+          "websocket_streams": ["trade", "orderbook", "liquidation"],
+          "instruments": ["BTCUSDT", "ETHUSDT", "SOLUSDT", "AVAXUSDT"]
+        },
+        
+        "dydx": {
+          "testnet": true,
+          "instruments": ["BTC-USD", "ETH-USD", "SOL-USD"],
+          "data_types": ["trades", "orderbook", "funding"]
+        }
+      },
+      
+      "stock_feeds": {
+        "interactive_brokers": {
+          "paper_trading": true,
+          "market_data_type": "DELAYED",
+          "instruments": {
+            "US_EQUITIES": ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "TSLA", "META"],
+            "ETFS": ["SPY", "QQQ", "IWM", "DIA", "VTI", "ARKK"],
+            "FUTURES": ["ES", "NQ", "RTY", "YM"]
+          }
+        },
+        
+        "databento": {
+          "dataset": "XNAS.ITCH",
+          "schema": "trades",
+          "instruments": ["AAPL", "MSFT", "NVDA", "AMD", "INTC"]
+        },
+        
+        "alpaca": {
+          "paper_trading": true,
+          "data_stream": "sip",
+          "instruments": "S&P500"
+        }
+      },
+      
+      "forex_feeds": {
+        "primary_ecn": {
+          "provider": "integral",
+          "instruments": [
+            "EUR/USD", "GBP/USD", "USD/JPY", "USD/CHF",
+            "AUD/USD", "USD/CAD", "NZD/USD", "EUR/GBP",
+            "EUR/JPY", "GBP/JPY", "AUD/JPY", "EUR/AUD"
+          ],
+          "tick_data": true,
+          "market_depth": 10
+        }
+      },
+      
+      "commodities_feeds": {
+        "cme": {
+          "products": ["GC", "SI", "CL", "NG", "ZC", "ZS", "ZW"],
+          "data_types": ["trades", "quotes", "market_depth"]
+        }
+      }
+    },
+    
+    "nautilus_configuration": {
+      "engine_config": {
+        "tick_capacity": 10000000,
+        "bar_capacity": 1000000,
+        "snapshot_orders": true,
+        "snapshot_positions": true,
+        "snapshot_positions_interval_secs": 60
+      },
+      
+      "execution_config": {
+        "load_strategy_state": true,
+        "save_strategy_state": true,
+        "allow_cash_positions": true,
+        "debug_mode": false
+      },
+      
+      "risk_engine_config": {
+        "bypass_risk": false,
+        "max_order_rate": {
+          "per_second": 10,
+          "per_minute": 100
+        },
+        "max_position_size": {
+          "crypto": 10.0,
+          "equities": 10000,
+          "forex": 1000000
+        }
+      },
+      
+      "data_engine_config": {
+        "time_bars_build_with_no_updates": true,
+        "validate_data_sequence": true,
+        "buffer_size_bytes": 104857600
+      }
+    },
+    
+    "strategy_templates": {
+      "ema_crossover_template": {
+        "base_config": {
+          "order_size_type": "RISK_BASED",
+          "risk_per_trade": 0.01,
+          "use_stops": true,
+          "use_targets": true,
+          "trailing_stop": false
+        },
+        "parameter_ranges": {
+          "fast_ema": {"min": 5, "max": 50, "step": 5},
+          "slow_ema": {"min": 20, "max": 200, "step": 10},
+          "atr_period": {"min": 14, "max": 21, "step": 7},
+          "stop_distance_atr": {"min": 1.0, "max": 3.0, "step": 0.5}
+        }
+      },
+      
+      "mean_reversion_template": {
+        "base_config": {
+          "entry_threshold_std": 2.0,
+          "exit_threshold_std": 0.0,
+          "lookback_period": 20,
+          "position_sizing": "KELLY_FRACTION"
+        }
+      },
+      
+      "market_maker_template": {
+        "base_config": {
+          "spread_bps": 10,
+          "levels": 3,
+          "level_spacing_bps": 5,
+          "inventory_target": 0.0,
+          "inventory_limit": 10.0
+        }
+      }
+    },
+    
+    "evaluation_metrics": {
+      "real_time_metrics": {
+        "update_frequency_seconds": 5,
+        "metrics": [
+          "unrealized_pnl",
+          "realized_pnl",
+          "position_count",
+          "order_count",
+          "win_rate",
+          "current_drawdown",
+          "sharpe_ratio_rolling"
+        ]
+      },
+      
+      "interval_metrics": {
+        "hourly": [
+          "hourly_pnl",
+          "hourly_trades",
+          "hourly_volume",
+          "inventory_turnover"
+        ],
+        
+        "daily": [
+          "daily_pnl",
+          "daily_sharpe",
+          "max_intraday_drawdown",
+          "volume_traded",
+          "fees_paid",
+          "slippage_cost"
+        ],
+        
+        "weekly": [
+          "weekly_return",
+          "weekly_sharpe",
+          "weekly_sortino",
+          "profit_factor",
+          "win_loss_ratio",
+          "correlation_matrix"
+        ]
+      },
+      
+      "risk_metrics": {
+        "var_95": {"window": 100},
+        "cvar_95": {"window": 100},
+        "max_drawdown": {"type": "underwater"},
+        "downside_deviation": {"mar": 0.0},
+        "beta": {"benchmark": "SPY"}
+      }
+    },
+    
+    "monitoring_dashboard": {
+      "web_interface": {
+        "port": 8080,
+        "update_interval_ms": 1000,
+        "charts": [
+          "equity_curve",
+          "drawdown_chart",
+          "position_heatmap",
+          "pnl_distribution",
+          "strategy_performance_grid"
+        ]
+      },
+      
+      "alerts": {
+        "drawdown_warning": -5.0,
+        "drawdown_critical": -10.0,
+        "margin_usage_warning": 0.7,
+        "margin_usage_critical": 0.9,
+        "position_size_warning": 0.8,
+        "daily_loss_limit": -0.03
+      },
+      
+      "reporting": {
+        "real_time_json": true,
+        "csv_export": true,
+        "performance_snapshots": true,
+        "telegram_notifications": true
+      }
+    },
+    
+    "backtesting_validation": {
+      "parallel_backtests": {
+        "enabled": true,
+        "lookback_days": 30,
+        "forward_test_correlation": true
+      },
+      
+      "monte_carlo_simulation": {
+        "enabled": true,
+        "iterations": 1000,
+        "confidence_intervals": [0.95, 0.99]
+      },
+      
+      "stress_testing": {
+        "scenarios": [
+          "flash_crash",
+          "low_liquidity",
+          "high_volatility",
+          "correlation_breakdown"
+        ]
+      }
+    },
+    
+    "data_storage": {
+      "tick_data": {
+        "format": "parquet",
+        "compression": "snappy",
+        "partition_by": "date"
+      },
+      
+      "bar_data": {
+        "format": "parquet",
+        "aggregations": ["1m", "5m", "15m", "1h", "1d"]
+      },
+      
+      "order_data": {
+        "format": "json",
+        "include_rejected": true,
+        "include_canceled": true
+      },
+      
+      "performance_data": {
+        "format": "sqlite",
+        "tables": [
+          "trades",
+          "positions",
+          "daily_performance",
+          "strategy_metrics"
+        ]
+      }
+    },
+    
+    "failsafe_mechanisms": {
+      "circuit_breakers": {
+        "daily_loss_limit": -0.05,
+        "consecutive_losses": 5,
+        "error_rate_threshold": 0.1
+      },
+      
+      "position_limits": {
+        "max_concurrent_positions": 20,
+        "max_position_size_pct": 0.1,
+        "max_sector_exposure": 0.3
+      },
+      
+      "order_validation": {
+        "price_deviation_check": 0.05,
+        "size_validation": true,
+        "duplicate_order_check": true
+      }
+    }
+  }
+}

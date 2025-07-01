@@ -1,0 +1,51 @@
+{
+  "account": {
+    "base_currency": "BTC",
+    "starting_balance": 0.3,
+    "leverage": 1.0
+  },
+  "risk_limits": {
+    "max_position_size_btc": 0.075,
+    "max_daily_loss_percent": 2.0,
+    "max_drawdown_percent": 10.0,
+    "max_leverage": 2.0,
+    "stop_loss_percent": 3.0,
+    "position_sizing_method": "kelly_criterion"
+  },
+  "target_returns": {
+    "annual_target_percent": 10.0,
+    "monthly_target_percent": 0.83,
+    "risk_free_rate": 0.05
+  },
+  "strategies": {
+    "primary": "ai_market_maker",
+    "secondary": ["ai_trend_follower", "ai_mean_reversion"],
+    "allocation_mode": "dynamic",
+    "rebalance_frequency": "daily"
+  },
+  "markets": {
+    "primary_exchange": "BINANCE",
+    "instruments": [
+      "BTCUSDT.BINANCE",
+      "ETHBTC.BINANCE",
+      "BNBBTC.BINANCE"
+    ],
+    "use_btc_pairs": true,
+    "avoid_usdt_exposure": false
+  },
+  "paper_trading": {
+    "enabled": true,
+    "duration_days": 14,
+    "auto_transition": true
+  },
+  "monitoring": {
+    "dashboard_port": 5000,
+    "alert_channels": ["email", "telegram"],
+    "performance_report_frequency": "daily"
+  },
+  "optimization": {
+    "enable_ml_tuning": true,
+    "optimization_frequency": "weekly",
+    "lookback_periods": 30
+  }
+}

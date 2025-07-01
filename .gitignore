@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# Trading specific
+*.log
+logs/
+data/
+backtest_results/
+live_trades/
+state_persistence/
+autonomous_state.json
+
+# Credentials - NEVER commit these!
+telegram_config.json
+*_api_keys.json
+.env
+.env.local
+credentials/
+secrets/
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Build
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Performance data
+performance_reports/
+*.csv
+*.parquet
+
+# Temporary
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp

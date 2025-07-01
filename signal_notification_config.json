@@ -1,0 +1,109 @@
+{
+  "signal_notifications": {
+    "enabled": true,
+    "channels": {
+      "telegram": {
+        "enabled": true,
+        "bot_token": "YOUR_TELEGRAM_BOT_TOKEN",
+        "chat_id": "YOUR_CHAT_ID",
+        "signal_alerts": {
+          "entry_signals": true,
+          "exit_signals": true,
+          "stop_loss_triggers": true,
+          "take_profit_triggers": true,
+          "include_analysis": true,
+          "include_chart_snapshot": false
+        },
+        "format": "detailed"
+      },
+      "email": {
+        "enabled": true,
+        "smtp_server": "smtp.gmail.com",
+        "smtp_port": 587,
+        "sender": "your_trading_bot@gmail.com",
+        "password": "your_app_specific_password",
+        "recipients": ["your_email@gmail.com"],
+        "signal_digest": {
+          "immediate_critical": true,
+          "batch_non_critical": true,
+          "batch_interval_minutes": 60
+        }
+      },
+      "discord": {
+        "enabled": false,
+        "webhook_url": "https://discord.com/api/webhooks/YOUR_WEBHOOK_URL",
+        "username": "Nautilus Trader Bot",
+        "avatar_url": "https://example.com/bot-avatar.png"
+      },
+      "pushover": {
+        "enabled": false,
+        "user_key": "YOUR_PUSHOVER_USER_KEY",
+        "api_token": "YOUR_PUSHOVER_API_TOKEN",
+        "priority": 0,
+        "sound": "cosmic"
+      }
+    },
+    "signal_types": {
+      "BUY_SIGNAL": {
+        "enabled": true,
+        "level": "INFO",
+        "template": "🟢 BUY SIGNAL\n{instrument}\nPrice: {price}\nStrategy: {strategy}\nConfidence: {confidence}%\nReason: {reason}"
+      },
+      "SELL_SIGNAL": {
+        "enabled": true,
+        "level": "INFO",
+        "template": "🔴 SELL SIGNAL\n{instrument}\nPrice: {price}\nStrategy: {strategy}\nConfidence: {confidence}%\nReason: {reason}"
+      },
+      "STOP_LOSS": {
+        "enabled": true,
+        "level": "WARNING",
+        "template": "⚠️ STOP LOSS TRIGGERED\n{instrument}\nEntry: {entry_price}\nExit: {exit_price}\nLoss: {loss_percent}%"
+      },
+      "TAKE_PROFIT": {
+        "enabled": true,
+        "level": "INFO",
+        "template": "✅ TAKE PROFIT\n{instrument}\nEntry: {entry_price}\nExit: {exit_price}\nProfit: {profit_percent}%"
+      },
+      "MARKET_ALERT": {
+        "enabled": true,
+        "level": "WARNING",
+        "template": "📊 MARKET ALERT\n{alert_type}\n{description}"
+      }
+    },
+    "filtering": {
+      "minimum_confidence": 70,
+      "minimum_position_size_btc": 0.001,
+      "quiet_hours": {
+        "enabled": false,
+        "start": "23:00",
+        "end": "07:00",
+        "timezone": "UTC",
+        "allow_critical": true
+      },
+      "rate_limiting": {
+        "max_per_hour": 20,
+        "max_per_day": 100
+      }
+    },
+    "summary_reports": {
+      "daily_summary": {
+        "enabled": true,
+        "time": "09:00",
+        "timezone": "UTC",
+        "include_sections": [
+          "performance_overview",
+          "trades_executed",
+          "signals_generated",
+          "risk_metrics",
+          "upcoming_events"
+        ]
+      },
+      "weekly_summary": {
+        "enabled": true,
+        "day": "monday",
+        "time": "09:00",
+        "include_charts": true
+      }
+    }
+  }
+}
