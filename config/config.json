@@ -1,0 +1,33 @@
+{
+  "exchange": {
+    "name": "binance",
+    "api_key": "",
+    "api_secret": "",
+    "testnet": true
+  },
+  "trading": {
+    "max_positions": 3,
+    "position_size_pct": 0.1,
+    "max_daily_loss_pct": 0.02,
+    "stop_loss_pct": 0.02,
+    "take_profit_pct": 0.05,
+    "leverage": 1
+  },
+  "risk": {
+    "max_drawdown_pct": 0.1,
+    "max_position_size_usd": 1000,
+    "min_volume_24h": 1000000,
+    "cooldown_minutes": 15
+  },
+  "monitoring": {
+    "update_interval_seconds": 30,
+    "log_level": "INFO",
+    "enable_notifications": false,
+    "webhook_url": ""
+  },
+  "strategies": {
+    "enabled": ["trend_following", "mean_reversion"],
+    "timeframes": ["15m", "1h"],
+    "default_lookback": 100
+  }
+}

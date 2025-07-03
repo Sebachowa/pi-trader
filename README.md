@@ -144,7 +144,7 @@ El repositorio incluye workflows para:
 
 - [Deployment Guide](trader-pi/DEPLOYMENT.md) - Guía completa de deployment
 - [Architecture](architecture/system_design.py) - Diseño del sistema
-- [API Documentation](docs/api/) - Documentación de APIs
+- [Trading Strategies](autonomous_trading/strategies/) - Implementación de estrategias
 
 ## 🤝 Contribuir
 
