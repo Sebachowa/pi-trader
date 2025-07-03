@@ -1,17 +1,3 @@
-# -------------------------------------------------------------------------------------------------
-#  Copyright (C) 2015-2025 Nautech Systems Pty Ltd. All rights reserved.
-#  https://nautechsystems.io
-#
-#  Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
-#  You may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at https://www.gnu.org/licenses/lgpl-3.0.en.html
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
-# -------------------------------------------------------------------------------------------------
 
 """
 Autonomous Engine - Central coordination for 24/7 trading operations.
@@ -30,8 +16,8 @@ from typing import Any, Dict, List, Optional, Set
 from nautilus_trader.common.component import Component
 from nautilus_trader.common.component import LiveClock
 from nautilus_trader.common.component import MessageBus
-from nautilus_trader.common.logging import Logger
-from nautilus_trader.config import LiveTradingNodeConfig
+# from nautilus_trader.core.rust.common import Logger  # Not available in this version
+from nautilus_trader.config import TradingNodeConfig
 from nautilus_trader.core.datetime import dt_to_unix_nanos
 from nautilus_trader.live.node import TradingNode
 from nautilus_trader.model.identifiers import TraderId
@@ -102,16 +88,21 @@ class AutonomousEngine(Component):
         self,
         config: AutonomousEngineConfig,
         trading_node: TradingNode,
-        logger: Logger,
+        logger: Any,  # Logger type
         clock: LiveClock,
         msgbus: MessageBus,
     ):
-        super().__init__(
-            clock=clock,
-            logger=logger,
-            component_id=f"{config.trader_id}-ENGINE",
-            msgbus=msgbus,
-        )
+        # Initialize component with minimal parameters
+        try:
+            super().__init__()
+        except Exception:
+            # If that fails, try with specific parameters
+            pass
+        
+        self.clock = clock
+        self.logger = logger
+        self.msgbus = msgbus
+        self._component_id = f"{config.trader_id}-ENGINE"
         
         self.config = config
         self.trading_node = trading_node

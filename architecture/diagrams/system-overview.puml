@@ -1,0 +1,95 @@
+@startuml Trading System Architecture Overview
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam componentStyle rectangle
+
+title 24/7 Autonomous Trading System - High Level Architecture
+
+package "External Data Sources" {
+    [Exchange APIs] as exchanges
+    [Market Data Providers] as providers
+    [News/Sentiment APIs] as news
+}
+
+package "Data Ingestion Layer" {
+    component "Market Data Service" as mds {
+        [WebSocket Handler]
+        [REST Adapter]
+        [Data Normalizer]
+        [Time Series Cache]
+    }
+}
+
+package "Core Trading Engine" {
+    component "Strategy Engine" as strategy {
+        [Strategy Manager]
+        [Signal Generator]
+        [Backtester]
+    }
+    
+    component "Risk Management" as risk {
+        [Position Limiter]
+        [VaR Calculator]
+        [Circuit Breaker]
+    }
+    
+    component "Execution Engine" as execution {
+        [Order Router]
+        [Smart Order Router]
+        [Fill Manager]
+    }
+}
+
+package "Portfolio Management" {
+    component "Portfolio Optimizer" as portfolio {
+        [Asset Allocator]
+        [Rebalancer]
+        [Performance Tracker]
+    }
+}
+
+package "ML Pipeline" {
+    component "Feature Engineering" as features
+    component "Model Training" as training
+    component "Model Serving" as serving
+}
+
+package "Infrastructure Services" {
+    database "TimescaleDB" as tsdb
+    database "PostgreSQL" as pg
+    queue "Kafka" as kafka
+    storage "Redis" as redis
+    component "API Gateway" as api
+}
+
+package "Trading Interfaces" {
+    component "Paper Trading" as paper
+    component "Live Trading" as live
+}
+
+' Connections
+exchanges --> mds : Market Data
+providers --> mds : Quotes
+news --> features : Sentiment
+
+mds --> kafka : Events
+kafka --> strategy : Market Events
+kafka --> risk : Position Updates
+kafka --> portfolio : Performance Data
+
+strategy --> execution : Trading Signals
+risk --> execution : Risk Limits
+execution --> paper : Test Orders
+execution --> live : Live Orders
+
+strategy --> tsdb : Historical Data
+portfolio --> pg : Portfolio State
+features --> training : Features
+training --> serving : Models
+serving --> strategy : Predictions
+
+api --> strategy : Control API
+api --> risk : Risk API
+api --> portfolio : Portfolio API
+
+@enduml

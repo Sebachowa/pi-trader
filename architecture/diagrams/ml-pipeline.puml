@@ -1,0 +1,97 @@
+@startuml ML Pipeline Architecture
+!theme plain
+skinparam backgroundColor #FEFEFE
+
+title Self-Improvement ML Pipeline
+
+package "Data Sources" {
+    database "Trade History" as trades
+    database "Market Data" as market
+    database "Performance Metrics" as metrics
+}
+
+package "Feature Engineering" {
+    component "Data Processor" as processor {
+        [Data Cleaner]
+        [Feature Extractor]
+        [Feature Store]
+    }
+    
+    component "Feature Types" as features {
+        [Technical Indicators]
+        [Market Microstructure]
+        [Sentiment Features]
+        [Performance Features]
+    }
+}
+
+package "Model Training" {
+    component "AutoML Pipeline" as automl {
+        [Data Splitter]
+        [Model Selection]
+        [Hyperparameter Tuning]
+        [Cross Validation]
+    }
+    
+    component "Model Types" as models {
+        [Price Prediction]
+        [Signal Generation]
+        [Risk Assessment]
+        [Regime Detection]
+    }
+}
+
+package "Model Management" {
+    component "MLOps" as mlops {
+        [Model Registry]
+        [A/B Testing]
+        [Performance Monitor]
+        [Model Versioning]
+    }
+    
+    database "Model Store" as modelstore
+}
+
+package "Model Serving" {
+    component "Inference Engine" as inference {
+        [Model Loader]
+        [Batch Predictor]
+        [Real-time Predictor]
+        [Result Cache]
+    }
+}
+
+package "Feedback Loop" {
+    component "Performance Analyzer" as analyzer
+    component "Model Updater" as updater
+}
+
+' Data flow
+trades --> processor
+market --> processor
+metrics --> processor
+
+processor --> features
+features --> automl
+
+automl --> models
+models --> mlops
+mlops --> modelstore
+
+modelstore --> inference
+inference --> analyzer
+analyzer --> metrics
+analyzer --> updater
+updater --> automl
+
+note right of automl
+  Continuous retraining
+  based on performance
+end note
+
+note right of inference
+  Low-latency predictions
+  for real-time trading
+end note
+
+@enduml

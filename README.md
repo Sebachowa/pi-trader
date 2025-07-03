@@ -1,187 +1,167 @@
-# 🤖 Nautilus AutoBot - Autonomous Trading System
+# 🤖 Trading Systems Portfolio
 
-An intelligent, self-managing trading bot built on top of [Nautilus Trader](https://github.com/nautechsystems/nautilus_trader).
+Este repositorio contiene un portfolio completo de sistemas de trading automatizado, diseñado para operar 24/7 con mínima intervención humana.
 
-## 🎯 Features
-
-- **10% Annual Return Target** - Optimized for consistent passive income
-- **Minimal Human Intervention** - Runs autonomously for weeks
-- **Self-Healing System** - Automatic error recovery and adaptation
-- **ML-Powered Strategy Selection** - Chooses best strategies for market conditions
-- **Multi-Strategy Orchestration** - Runs multiple strategies simultaneously
-- **Adaptive Risk Management** - Dynamic position sizing based on market regime
-- **Passive Income Optimization** - Compound growth with withdrawal planning
-
-## 🏗️ Architecture
+## 🏗️ Arquitectura del Sistema
 
 ```
-nautilus_autobot/
-├── autonomous_trading/         # Core autonomous system
-│   ├── core/                  # Engine, risk controller, optimizers
-│   ├── strategies/            # Trading strategies
-│   ├── monitoring/            # Performance tracking
-│   └── config/               # Configuration files
-├── docs/                      # Documentation
-├── tests/                     # Test suite
-└── scripts/                   # Utility scripts
+┌─────────────────────────────────────────────────────────┐
+│                   SISTEMA PRINCIPAL                      │
+│              autonomous_trading (Nautilus)               │
+│  • ML/AI Strategy Selection                              │
+│  • Advanced Risk Management                              │
+│  • Self-healing capabilities                             │
+│  • Target: 10% annual returns                            │
+└─────────────────────────────────────────────────────────┘
+                          ↕️
+┌─────────────────────────────────────────────────────────┐
+│                    SISTEMA EDGE                          │
+│                trader-pi (Raspberry Pi)                  │
+│  • Lightweight CCXT-based                                │
+│  • Basic strategies                                      │
+│  • Remote monitoring                                     │
+│  • Backup trading capability                             │
+└─────────────────────────────────────────────────────────┘
 ```
+
+## 📁 Estructura del Proyecto
+
+### 🎯 Sistema Principal: `autonomous_trading/`
+Sistema profesional completo basado en Nautilus Trader para servidores/workstations.
+
+**Características:**
+- ✅ ML-powered strategy selection
+- ✅ Multi-asset support (crypto, stocks, forex)
+- ✅ Advanced risk management with Kelly Criterion
+- ✅ Self-healing and auto-recovery
+- ✅ Paper trading capabilities
+- ✅ Comprehensive monitoring
+
+**Uso:**
+```bash
+./start_autonomous_trading.sh
+```
+
+### 📱 Sistema Edge: `trader-pi/`
+Sistema ligero optimizado para dispositivos de recursos limitados.
+
+**Características:**
+- ✅ Optimizado para ARM (Raspberry Pi)
+- ✅ Consumo mínimo de recursos (<1GB RAM)
+- ✅ Estrategias básicas pero efectivas
+- ✅ Deployment automático con GitHub Actions
+- ✅ Monitoreo remoto
+
+**Deployment:**
+```bash
+cd trader-pi
+make deploy
+```
+
+### 📊 Sistemas Adicionales
+
+- **`paper_trading/`** - Motor de simulación realista
+- **`multi_asset_system/`** - Sistema unificado multi-activos
+- **`deployment/`** - Scripts y configuraciones de deployment
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-- Python 3.11+
-- Nautilus Trader
-- Exchange API keys (for live trading)
-
-### Installation
-
+### Opción 1: Sistema Principal (Producción)
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/nautilus_autobot.git
-cd nautilus_autobot
+# Configurar
+cp autonomous_trading/config/trading_config.json.example autonomous_trading/config/trading_config.json
+# Editar configuración...
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
+# Ejecutar
+./start_autonomous_trading.sh
 ```
 
-### Configuration
-
-1. Copy the example config:
+### Opción 2: Sistema Raspberry Pi
 ```bash
-cp autonomous_trading/config/autonomous_config_complete.json config.json
+# En tu Raspberry Pi
+cd trader-pi
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements-pi.txt
+python3 run.py --paper
 ```
 
-2. Set up exchange credentials (for live trading):
+## 🔧 Configuración
+
+### Variables de Entorno
 ```bash
-export BINANCE_API_KEY="your_api_key"
-export BINANCE_API_SECRET="your_secret"
+# Binance
+export BINANCE_API_KEY="your-key"
+export BINANCE_API_SECRET="your-secret"
+
+# Notificaciones (opcional)
+export TELEGRAM_BOT_TOKEN="your-token"
+export TELEGRAM_CHAT_ID="your-chat-id"
 ```
 
-3. Configure Telegram notifications (optional):
-```bash
-cp telegram_config.example.json telegram_config.json
-# Edit with your bot token and chat ID
-```
+## 📈 Estrategias Disponibles
 
-## 📊 Running the Challenge
-
-### 14-Day Paper Trading Evaluation
-
-```bash
-# Run paper trading for 14 days
-python run_challenge.py --mode paper --days 14 --capital 0.3
-```
-
-### Monitor Performance
-
-```bash
-# Check status
-python scripts/check_status.py
-
-# View live logs
-tail -f logs/autobot.log
-
-# Generate performance report
-python scripts/generate_report.py
-```
-
-## 🎯 Performance Targets
-
-- **Annual Return**: 10% (0.83% monthly)
-- **Max Drawdown**: 10%
-- **Sharpe Ratio**: >1.5
-- **Win Rate**: >55%
-- **Daily Loss Limit**: 2%
-
-## 🧠 Strategies
-
-The bot includes multiple strategies that adapt to market conditions:
-
-1. **Trend Following** - EMA crossovers with momentum confirmation
-2. **Mean Reversion** - Bollinger Bands with RSI divergence
-3. **Market Making** - Spread capture in liquid markets
-4. **Arbitrage** - Cross-exchange opportunities
-5. **ML Predictions** - LSTM-based price forecasting
+| Estrategia | Sistema Principal | Sistema Pi | Descripción |
+|------------|------------------|-------------|-------------|
+| Trend Following | ✅ Advanced | ✅ Simple | Sigue tendencias del mercado |
+| Mean Reversion | ✅ ML-enhanced | ✅ Bollinger | Aprovecha reversiones |
+| Momentum | ✅ Multi-timeframe | ✅ RSI-based | Trading de momentum |
+| Market Making | ✅ Advanced | ❌ | Provee liquidez |
+| ML Strategy | ✅ Ensemble | ❌ | Estrategias con IA |
 
 ## 🛡️ Risk Management
 
-- **Adaptive Position Sizing** - Based on volatility and regime
-- **Portfolio Limits** - Max exposure per asset and total
-- **Correlation Control** - Avoid concentrated risks
-- **Circuit Breakers** - Emergency stops on extreme moves
+Ambos sistemas implementan:
+- Stop-loss dinámico
+- Position sizing basado en volatilidad
+- Límites de drawdown diario
+- Circuit breakers automáticos
 
-## 📱 Monitoring
+## 📊 Monitoreo
 
-- **Telegram Notifications** - Real-time trade alerts
-- **Web Dashboard** - Performance metrics and charts
-- **Daily Reports** - Automated performance summaries
-- **Health Checks** - System status monitoring
+### Sistema Principal
+- Logs detallados en `logs/`
+- Métricas en tiempo real
+- Dashboard web (opcional)
 
-## 🔧 Customization
-
-### Add a New Strategy
-
-```python
-# autonomous_trading/strategies/my_strategy.py
-from autonomous_trading.strategies.base import BaseStrategy
-
-class MyStrategy(BaseStrategy):
-    def on_data(self, data):
-        # Your trading logic here
-        pass
-```
-
-### Modify Risk Parameters
-
-Edit `config.json`:
-```json
-{
-  "risk_management": {
-    "max_position_size": 0.05,
-    "max_daily_loss_percent": 2.0
-  }
-}
-```
-
-## 📈 Live Trading
-
-After successful paper trading:
-
+### Sistema Pi
 ```bash
-# Switch to live mode with small capital
-python run_challenge.py --mode live --capital 0.1
-
-# Monitor carefully for first week
-python scripts/monitor_live.py
+# Monitoreo remoto
+make logs
+make status
 ```
 
-## 🤝 Contributing
+## 🔄 CI/CD
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+### GitHub Actions
+El repositorio incluye workflows para:
+- ✅ Tests automáticos
+- ✅ Deployment a Raspberry Pi
+- ✅ Notificaciones de deployment
+- ✅ Rollback automático
 
-## ⚖️ License
+## 📚 Documentación Adicional
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- [Deployment Guide](trader-pi/DEPLOYMENT.md) - Guía completa de deployment
+- [Architecture](architecture/system_design.py) - Diseño del sistema
+- [API Documentation](docs/api/) - Documentación de APIs
 
-## 🙏 Acknowledgments
+## 🤝 Contribuir
 
-- Built on [Nautilus Trader](https://nautilustrader.io)
-- Inspired by quantitative trading research
-- Community contributions welcome
+1. Fork el repositorio
+2. Crea tu feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add AmazingFeature'`)
+4. Push al branch (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT - ver [LICENSE](LICENSE) para detalles.
 
 ## ⚠️ Disclaimer
 
-Trading involves significant risk. Past performance is not indicative of future results. Only trade with capital you can afford to lose. This software is provided as-is without any guarantees.
+Este software es para fines educativos. El trading conlleva riesgos significativos. Úsalo bajo tu propia responsabilidad.
 
 ---
 
-**Remember**: The goal is passive income through intelligent, autonomous trading with minimal human intervention.
+**Desarrollado para operar 24/7 con mínima intervención humana** 🚀

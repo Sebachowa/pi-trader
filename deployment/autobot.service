@@ -1,0 +1,45 @@
+[Unit]
+Description=Autonomous Trading System (AutoBot)
+Documentation=https://github.com/yourusername/autonomous-trader
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=trader
+Group=trader
+WorkingDirectory=/opt/autonomous-trader
+
+# Environment variables
+Environment="PYTHONPATH=/opt/autonomous-trader"
+Environment="PYTHONUNBUFFERED=1"
+EnvironmentFile=/opt/autonomous-trader/.env
+
+# Start command
+ExecStart=/opt/autonomous-trader/venv/bin/python -u /opt/autonomous-trader/autonomous_trading/main_trading_system.py /opt/autonomous-trader/autonomous_trading/config/trading_config.json
+
+# Restart configuration
+Restart=always
+RestartSec=30
+StartLimitInterval=600
+StartLimitBurst=5
+
+# Resource limits
+LimitNOFILE=65535
+MemoryLimit=4G
+CPUQuota=200%
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/autonomous-trader/data /opt/autonomous-trader/logs /opt/autonomous-trader/backups
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=autobot
+
+[Install]
+WantedBy=multi-user.target

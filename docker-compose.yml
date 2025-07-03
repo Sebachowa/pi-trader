@@ -1,0 +1,187 @@
+version: '3.8'
+
+services:
+  autobot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: autonomous-trader
+    restart: unless-stopped
+    
+    environment:
+      # Trading mode
+      - TRADING_MODE=${TRADING_MODE:-paper}
+      
+      # Binance API (for live trading)
+      - BINANCE_API_KEY=${BINANCE_API_KEY}
+      - BINANCE_API_SECRET=${BINANCE_API_SECRET}
+      
+      # Telegram notifications
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      
+      # System settings
+      - TZ=UTC
+      - PYTHONUNBUFFERED=1
+      
+    volumes:
+      # Configuration
+      - ./autonomous_trading/config:/app/autonomous_trading/config:ro
+      
+      # Persistent data
+      - trader_data:/app/data
+      - trader_logs:/app/logs
+      - trader_backups:/app/backups
+      
+    ports:
+      # Monitoring dashboard
+      - "8080:8080"
+      
+    networks:
+      - trader_network
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+          
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+        
+  # Monitoring stack
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: trader-prometheus
+    restart: unless-stopped
+    
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+      
+    ports:
+      - "9090:9090"
+      
+    networks:
+      - trader_network
+      
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      
+  grafana:
+    image: grafana/grafana:latest
+    container_name: trader-grafana
+    restart: unless-stopped
+    
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+      
+    ports:
+      - "3000:3000"
+      
+    networks:
+      - trader_network
+      
+    depends_on:
+      - prometheus
+      
+  # Database for historical data
+  postgres:
+    image: postgres:15-alpine
+    container_name: trader-postgres
+    restart: unless-stopped
+    
+    environment:
+      - POSTGRES_DB=trading
+      - POSTGRES_USER=${POSTGRES_USER:-trader}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-securepassword}
+      
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      
+    ports:
+      - "5432:5432"
+      
+    networks:
+      - trader_network
+      
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trader"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      
+  # Redis for caching and pub/sub
+  redis:
+    image: redis:7-alpine
+    container_name: trader-redis
+    restart: unless-stopped
+    
+    volumes:
+      - redis_data:/data
+      
+    ports:
+      - "6379:6379"
+      
+    networks:
+      - trader_network
+      
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redispassword}
+    
+  # Backup service
+  backup:
+    image: offen/docker-volume-backup:latest
+    container_name: trader-backup
+    restart: unless-stopped
+    
+    environment:
+      - BACKUP_CRON_EXPRESSION=0 2 * * *
+      - BACKUP_FILENAME=trader-backup-%Y%m%d_%H%M%S.tar.gz
+      - BACKUP_RETENTION_DAYS=30
+      
+    volumes:
+      - trader_data:/backup/data:ro
+      - trader_logs:/backup/logs:ro
+      - postgres_data:/backup/postgres:ro
+      - ./backups:/archive
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      
+    networks:
+      - trader_network
+
+volumes:
+  trader_data:
+    driver: local
+  trader_logs:
+    driver: local
+  trader_backups:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  trader_network:
+    driver: bridge

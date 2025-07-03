@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+
+# Logs
+logs/
+*.log
+
+# Configuration with secrets
+config/config.json
+config/config_*.json
+!config/config.example.json
+
+# Stats and state
+stats.json
+*.state
+*.pickle
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+.cache/
+
+# API Keys (never commit these!)
+.env
+secrets.json
+api_keys.txt

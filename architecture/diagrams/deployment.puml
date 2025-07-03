@@ -1,0 +1,110 @@
+@startuml Deployment Architecture
+!theme plain
+skinparam backgroundColor #FEFEFE
+
+title Trading System - Kubernetes Deployment Architecture
+
+cloud "AWS/GCP/Azure" {
+    
+    package "Region 1 (Primary)" {
+        
+        node "Control Plane" {
+            [API Server]
+            [Scheduler]
+            [Controller]
+        }
+        
+        node "Trading Core Nodes" {
+            component "Strategy Pods" as strategy_pods {
+                [Strategy Engine x3]
+                [Risk Manager x2]
+            }
+            component "Execution Pods" as exec_pods {
+                [Order Router x3]
+                [Fill Manager x2]
+            }
+        }
+        
+        node "Data Processing Nodes" {
+            component "Ingestion Pods" as ingest_pods {
+                [Market Data Service x5]
+                [Data Normalizer x3]
+            }
+            component "Cache Layer" as cache {
+                [Redis Cluster x3]
+            }
+        }
+        
+        node "ML/GPU Nodes" {
+            component "Training Pods" as train_pods {
+                [Model Training x2]
+                [Feature Engineering x3]
+            }
+            component "Serving Pods" as serve_pods {
+                [Model Serving x3]
+                [Inference Cache x2]
+            }
+        }
+        
+        node "Storage Nodes" {
+            database "TimescaleDB Cluster" as tsdb_primary
+            database "PostgreSQL HA" as pg_primary
+            storage "Object Storage" as s3_primary
+        }
+        
+        node "Infrastructure" {
+            [Prometheus]
+            [Grafana]
+            [Jaeger]
+            [ELK Stack]
+        }
+    }
+    
+    package "Region 2 (DR)" {
+        node "Standby Cluster" {
+            component "Standby Services" as standby {
+                [Strategy Engine]
+                [Risk Manager]
+                [Data Replication]
+            }
+            database "TimescaleDB Replica" as tsdb_replica
+            database "PostgreSQL Replica" as pg_replica
+        }
+    }
+    
+    package "Network Layer" {
+        [Load Balancer]
+        [WAF]
+        [CDN]
+        [VPN Gateway]
+    }
+}
+
+' Connections
+[Load Balancer] --> strategy_pods
+[Load Balancer] --> exec_pods
+
+ingest_pods --> cache
+cache --> strategy_pods
+strategy_pods --> exec_pods
+
+train_pods --> s3_primary
+serve_pods <-- s3_primary
+
+strategy_pods --> tsdb_primary
+exec_pods --> pg_primary
+
+tsdb_primary ..> tsdb_replica : Replication
+pg_primary ..> pg_replica : Replication
+
+note right of "GPU Nodes"
+  GPU-enabled nodes for
+  ML model training
+end note
+
+note bottom of "Region 2 (DR)"
+  Disaster Recovery
+  with automatic failover
+end note
+
+@enduml

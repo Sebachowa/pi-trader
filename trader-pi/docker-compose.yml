@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  trader:
+    build: .
+    image: trader-bot:latest
+    container_name: trader-bot
+    restart: unless-stopped
+    
+    # Resource limits for Raspberry Pi
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    
+    volumes:
+      # Persist data and logs
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config:ro
+      
+    environment:
+      - TZ=UTC
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+      
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "scripts/health_check.py"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+      
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        
+    # Network mode - use host for better performance on Pi
+    network_mode: host
+    
+  # Optional: Monitoring with Prometheus + Grafana
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: trader-prometheus
+    profiles: ["monitoring"]
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=30d'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9090:9090"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          
+  grafana:
+    image: grafana/grafana:latest
+    container_name: trader-grafana
+    profiles: ["monitoring"]
+    restart: unless-stopped
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    ports:
+      - "3000:3000"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          
+  # Optional: Watchtower for auto-updates
+  watchtower:
+    image: containrrr/watchtower
+    container_name: trader-watchtower
+    profiles: ["auto-update"]
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_SCHEDULE=0 0 4 * * *
+      - WATCHTOWER_NOTIFICATIONS=slack
+      - WATCHTOWER_NOTIFICATION_SLACK_HOOK_URL=${SLACK_WEBHOOK_URL}
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+
+volumes:
+  prometheus-data:
+  grafana-data:

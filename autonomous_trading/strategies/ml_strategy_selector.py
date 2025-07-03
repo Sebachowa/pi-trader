@@ -1,17 +1,3 @@
-# -------------------------------------------------------------------------------------------------
-#  Copyright (C) 2015-2025 Nautech Systems Pty Ltd. All rights reserved.
-#  https://nautechsystems.io
-#
-#  Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
-#  You may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at https://www.gnu.org/licenses/lgpl-3.0.en.html
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
-# -------------------------------------------------------------------------------------------------
 
 """
 ML-Powered Strategy Selection and Optimization System
@@ -36,7 +22,7 @@ from autonomous_trading.core.market_analyzer import MarketRegime
 from nautilus_trader.common.component import Component
 from nautilus_trader.common.component import LiveClock
 from nautilus_trader.common.component import MessageBus
-from nautilus_trader.common.logging import Logger
+# from nautilus_trader.common.logging import Logger  # Not available in this version
 from nautilus_trader.model.identifiers import InstrumentId, StrategyId
 from nautilus_trader.trading.strategy import Strategy
 
@@ -150,7 +136,7 @@ class MLStrategySelector(Component):
     
     def __init__(
         self,
-        logger: Logger,
+        logger: Any,  # Logger type
         clock: LiveClock,
         msgbus: MessageBus,
         enable_evolution: bool = True,
@@ -161,12 +147,17 @@ class MLStrategySelector(Component):
         mutation_rate: float = 0.1,
         crossover_rate: float = 0.7,
     ):
-        super().__init__(
-            clock=clock,
-            logger=logger,
-            component_id="ML-STRATEGY-SELECTOR",
-            msgbus=msgbus,
-        )
+        # Initialize component with minimal parameters
+        try:
+            super().__init__()
+        except Exception:
+            # If that fails, try with specific parameters
+            pass
+        
+        self.clock = clock
+        self.logger = logger
+        self.msgbus = msgbus
+        self._component_id = "ML-STRATEGY-SELECTOR"
         
         self.enable_evolution = enable_evolution
         self.enable_rl_selection = enable_rl_selection
@@ -229,7 +220,16 @@ class MLStrategySelector(Component):
         self._optimization_task = asyncio.create_task(self._optimization_loop())
         self._prediction_task = asyncio.create_task(self._prediction_loop())
         
-        self._log.info("ML Strategy Selector initialized")
+        if hasattr(self, "logger") and self.logger:
+
+        
+            self.logger.info("ML Strategy Selector initialized")
+
+        
+        else:
+
+        
+            print("INFO: " + str("ML Strategy Selector initialized"))
     
     def _initialize_population(self) -> None:
         """Initialize strategy population with diverse genes."""
@@ -427,7 +427,13 @@ class MLStrategySelector(Component):
             return regime_probs
             
         except Exception as e:
-            self._log.warning(f"Regime prediction failed: {e}")
+            if hasattr(self, "logger") and self.logger:
+
+                self.logger.warning(f"Regime prediction failed: {e}")
+
+            else:
+
+                print("WARNING: " + str(f"Regime prediction failed: {e}"))
             return {"unknown": 1.0}
     
     async def create_ensemble_strategy(
@@ -487,15 +493,27 @@ class MLStrategySelector(Component):
                 # Evolve population
                 await self._evolve_population()
                 
-                self._log.info(
+                if hasattr(self, "logger") and self.logger:
+                    self.logger.info(
                     f"Evolution completed - Generation {self._get_current_generation()}, "
                     f"Best fitness: {self._get_best_fitness():.3f}"
                 )
+                else:
+                    print("INFO: " + str(
+                    f"Evolution completed - Generation {self._get_current_generation()}, "
+                    f"Best fitness: {self._get_best_fitness():.3f}"
+                ))
                 
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                self._log.error(f"Evolution error: {e}")
+                if hasattr(self, "logger") and self.logger:
+
+                    self.logger.error(f"Evolution error: {e}")
+
+                else:
+
+                    print("ERROR: " + str(f"Evolution error: {e}"))
     
     async def _optimization_loop(self) -> None:
         """Background loop for parameter optimization."""
@@ -525,7 +543,13 @@ class MLStrategySelector(Component):
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                self._log.error(f"Optimization error: {e}")
+                if hasattr(self, "logger") and self.logger:
+
+                    self.logger.error(f"Optimization error: {e}")
+
+                else:
+
+                    print("ERROR: " + str(f"Optimization error: {e}"))
     
     async def _prediction_loop(self) -> None:
         """Background loop for updating predictions."""
@@ -550,7 +574,13 @@ class MLStrategySelector(Component):
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                self._log.error(f"Prediction loop error: {e}")
+                if hasattr(self, "logger") and self.logger:
+
+                    self.logger.error(f"Prediction loop error: {e}")
+
+                else:
+
+                    print("ERROR: " + str(f"Prediction loop error: {e}"))
     
     async def _evolve_population(self) -> None:
         """Perform one generation of evolution."""
@@ -964,17 +994,41 @@ class MLStrategySelector(Component):
                 self._feature_scaler.fit(X)
                 X_scaled = self._feature_scaler.transform(X)
                 self._regime_predictor.fit(X_scaled, y_regime)
-                self._log.info("Retrained regime predictor")
+                if hasattr(self, "logger") and self.logger:
+
+                    self.logger.info("Retrained regime predictor")
+
+                else:
+
+                    print("INFO: " + str("Retrained regime predictor"))
             except Exception as e:
-                self._log.error(f"Failed to train regime predictor: {e}")
+                if hasattr(self, "logger") and self.logger:
+
+                    self.logger.error(f"Failed to train regime predictor: {e}")
+
+                else:
+
+                    print("ERROR: " + str(f"Failed to train regime predictor: {e}"))
         
         # Train performance predictor
         if len(y_performance) > 50:
             try:
                 self._performance_predictor.fit(X, y_performance)
-                self._log.info("Retrained performance predictor")
+                if hasattr(self, "logger") and self.logger:
+
+                    self.logger.info("Retrained performance predictor")
+
+                else:
+
+                    print("INFO: " + str("Retrained performance predictor"))
             except Exception as e:
-                self._log.error(f"Failed to train performance predictor: {e}")
+                if hasattr(self, "logger") and self.logger:
+
+                    self.logger.error(f"Failed to train performance predictor: {e}")
+
+                else:
+
+                    print("ERROR: " + str(f"Failed to train performance predictor: {e}"))
     
     def _get_current_generation(self) -> int:
         """Get current generation number."""

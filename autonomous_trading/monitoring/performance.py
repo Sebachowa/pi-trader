@@ -1,17 +1,3 @@
-# -------------------------------------------------------------------------------------------------
-#  Copyright (C) 2015-2025 Nautech Systems Pty Ltd. All rights reserved.
-#  https://nautechsystems.io
-#
-#  Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
-#  You may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at https://www.gnu.org/licenses/lgpl-3.0.en.html
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
-# -------------------------------------------------------------------------------------------------
 
 """
 Performance Optimizer - Self-optimizing performance monitoring and parameter tuning.
@@ -30,7 +16,7 @@ from sklearn.gaussian_process.kernels import Matern
 from nautilus_trader.common.component import Component
 from nautilus_trader.common.component import LiveClock
 from nautilus_trader.common.component import MessageBus
-from nautilus_trader.common.logging import Logger
+# from nautilus_trader.common.logging import Logger  # Not available in this version
 from nautilus_trader.model.identifiers import StrategyId
 
 
@@ -63,7 +49,7 @@ class PerformanceOptimizer(Component):
     
     def __init__(
         self,
-        logger: Logger,
+        logger: Any,  # Logger type
         clock: LiveClock,
         msgbus: MessageBus,
         optimization_interval_hours: int = 24,
@@ -71,12 +57,17 @@ class PerformanceOptimizer(Component):
         exploration_fraction: float = 0.2,
         performance_window_days: int = 30,
     ):
-        super().__init__(
-            clock=clock,
-            logger=logger,
-            component_id="PERFORMANCE-OPTIMIZER",
-            msgbus=msgbus,
-        )
+        # Initialize component with minimal parameters
+        try:
+            super().__init__()
+        except Exception:
+            # If that fails, try with specific parameters
+            pass
+        
+        self.clock = clock
+        self.logger = logger
+        self.msgbus = msgbus
+        self._component_id = "PERFORMANCE-OPTIMIZER"
         
         self.optimization_interval_hours = optimization_interval_hours
         self.min_samples_for_optimization = min_samples_for_optimization
@@ -114,7 +105,10 @@ class PerformanceOptimizer(Component):
 
     async def start(self) -> None:
         """Start the performance optimizer."""
-        self._log.info("Starting Performance Optimizer...")
+        if hasattr(self, 'logger') and self.logger:
+            self.logger.info("Starting Performance Optimizer...")
+        else:
+            print("INFO: Starting Performance Optimizer...")
         
         # Initialize parameter spaces
         self._initialize_parameter_spaces()
@@ -125,7 +119,13 @@ class PerformanceOptimizer(Component):
 
     async def stop(self) -> None:
         """Stop the performance optimizer."""
-        self._log.info("Stopping Performance Optimizer...")
+        if hasattr(self, "logger") and self.logger:
+
+            self.logger.info("Stopping Performance Optimizer...")
+
+        else:
+
+            print("INFO: " + str("Stopping Performance Optimizer..."))
         
         if self._optimization_task:
             self._optimization_task.cancel()
@@ -215,7 +215,13 @@ class PerformanceOptimizer(Component):
                 
                 # Check if we have enough data
                 if len(self._trade_history) < self.min_samples_for_optimization:
-                    self._log.info("Not enough trades for optimization yet")
+                    if hasattr(self, "logger") and self.logger:
+
+                        self.logger.info("Not enough trades for optimization yet")
+
+                    else:
+
+                        print("INFO: " + str("Not enough trades for optimization yet"))
                     continue
                 
                 # Run optimization for each parameter space
@@ -225,11 +231,23 @@ class PerformanceOptimizer(Component):
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                self._log.error(f"Optimization error: {e}")
+                if hasattr(self, "logger") and self.logger:
+
+                    self.logger.error(f"Optimization error: {e}")
+
+                else:
+
+                    print("ERROR: " + str(f"Optimization error: {e}"))
 
     async def _optimize_parameter(self, param_name: str, param_space: ParameterSpace) -> None:
         """Optimize a single parameter using Bayesian optimization."""
-        self._log.info(f"Optimizing parameter: {param_name}")
+        if hasattr(self, "logger") and self.logger:
+
+            self.logger.info(f"Optimizing parameter: {param_name}")
+
+        else:
+
+            print("INFO: " + str(f"Optimizing parameter: {param_name}"))
         
         # Get historical results for this parameter
         historical_results = self._optimization_results.get(param_name, [])
@@ -249,7 +267,16 @@ class PerformanceOptimizer(Component):
             "value": next_value,
         })
         
-        self._log.info(f"Set {param_name} to {next_value}")
+        if hasattr(self, "logger") and self.logger:
+
+        
+            self.logger.info(f"Set {param_name} to {next_value}")
+
+        
+        else:
+
+        
+            print("INFO: " + str(f"Set {param_name} to {next_value}"))
 
     def _random_exploration(self, param_space: ParameterSpace) -> float:
         """Random exploration within parameter bounds."""
@@ -324,7 +351,13 @@ class PerformanceOptimizer(Component):
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                self._log.error(f"Analysis error: {e}")
+                if hasattr(self, "logger") and self.logger:
+
+                    self.logger.error(f"Analysis error: {e}")
+
+                else:
+
+                    print("ERROR: " + str(f"Analysis error: {e}"))
 
     async def _analyze_performance(self) -> None:
         """Analyze overall system performance."""

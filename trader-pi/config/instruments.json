@@ -1,0 +1,28 @@
+{
+  "instruments": [
+    {
+      "symbol": "BTCUSDT",
+      "enabled": true,
+      "min_order_size": 0.001,
+      "tick_size": 0.01,
+      "max_position_size": 0.1,
+      "strategies": ["trend_following", "mean_reversion"]
+    },
+    {
+      "symbol": "ETHUSDT",
+      "enabled": true,
+      "min_order_size": 0.01,
+      "tick_size": 0.01,
+      "max_position_size": 1.0,
+      "strategies": ["trend_following"]
+    },
+    {
+      "symbol": "BNBUSDT",
+      "enabled": false,
+      "min_order_size": 0.01,
+      "tick_size": 0.01,
+      "max_position_size": 2.0,
+      "strategies": ["mean_reversion"]
+    }
+  ]
+}

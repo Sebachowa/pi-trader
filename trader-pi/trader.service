@@ -1,0 +1,32 @@
+[Unit]
+Description=Raspberry Pi Trading Bot
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/trader-pi
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONPATH=/home/pi/trader-pi"
+ExecStart=/usr/bin/python3 /home/pi/trader-pi/run.py --log-level INFO
+Restart=always
+RestartSec=30
+
+# Resource limits for Raspberry Pi
+MemoryLimit=512M
+CPUQuota=80%
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/pi/trader-pi/logs
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=trader-pi
+
+[Install]
+WantedBy=multi-user.target

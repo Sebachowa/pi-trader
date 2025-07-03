@@ -2,7 +2,7 @@
 # Autonomous Trading System Built on Nautilus Trader
 
 # Core trading platform
-nautilus-trader>=1.219.0
+nautilus-trader>=1.218.0
 
 # Data analysis
 pandas>=2.2.0

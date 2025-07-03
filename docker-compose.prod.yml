@@ -1,0 +1,290 @@
+# Production Docker Compose configuration optimized for Raspberry Pi
+# Use with: docker-compose -f docker-compose.prod.yml up -d
+
+version: '3.8'
+
+services:
+  autobot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - BUILDPLATFORM=linux/arm64
+    container_name: autonomous-trader
+    restart: always
+    
+    environment:
+      # Trading mode
+      - TRADING_MODE=${TRADING_MODE:-paper}
+      
+      # Binance API (for live trading)
+      - BINANCE_API_KEY=${BINANCE_API_KEY}
+      - BINANCE_API_SECRET=${BINANCE_API_SECRET}
+      
+      # Telegram notifications
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      
+      # System settings
+      - TZ=UTC
+      - PYTHONUNBUFFERED=1
+      
+    volumes:
+      # Configuration
+      - ./autonomous_trading/config:/app/autonomous_trading/config:ro
+      
+      # Persistent data
+      - trader_data:/app/data
+      - trader_logs:/app/logs
+      - trader_backups:/app/backups
+      
+    ports:
+      # Monitoring dashboard
+      - "8080:8080"
+      
+    networks:
+      - trader_network
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'  # Reduced for Raspberry Pi
+          memory: 1G   # Reduced for Raspberry Pi
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+          
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"   # Reduced for SD card
+        max-file: "5"     # Reduced for SD card
+        
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+        
+  # Lightweight monitoring with Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: trader-prometheus
+    restart: always
+    
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+      
+    ports:
+      - "9090:9090"
+      
+    networks:
+      - trader_network
+      
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=7d'  # Reduced retention for SD card
+      - '--storage.tsdb.retention.size=1GB' # Size limit for SD card
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+          
+  # Redis for caching (memory optimized)
+  redis:
+    image: redis:7-alpine
+    container_name: trader-redis
+    restart: always
+    
+    volumes:
+      - redis_data:/data
+      
+    ports:
+      - "6379:6379"
+      
+    networks:
+      - trader_network
+      
+    command: >
+      redis-server 
+      --appendonly yes 
+      --requirepass ${REDIS_PASSWORD:-redispassword}
+      --maxmemory 128mb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 150M
+    
+  # Health monitor service
+  health-monitor:
+    image: alpine:latest
+    container_name: trader-health-monitor
+    restart: always
+    
+    volumes:
+      - ./scripts:/scripts:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      
+    environment:
+      - DISCORD_WEBHOOK=${DISCORD_WEBHOOK}
+      - SLACK_WEBHOOK=${SLACK_WEBHOOK}
+      
+    command: >
+      sh -c "apk add --no-cache curl docker-cli bash &&
+             while true; do
+               /scripts/health_check.sh || 
+               (echo 'Health check failed' && 
+                curl -X POST -H 'Content-type: application/json' 
+                --data '{\"text\":\"⚠️ Trader health check failed on Raspberry Pi\"}' 
+                $${SLACK_WEBHOOK:-http://localhost} 2>/dev/null);
+               sleep 300;
+             done"
+             
+    networks:
+      - trader_network
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 50M
+    
+  # Log rotation service
+  log-rotator:
+    image: blacklabelops/logrotate:latest
+    container_name: trader-log-rotator
+    restart: always
+    
+    environment:
+      - LOGS_DIRECTORIES=/logs
+      - LOGROTATE_INTERVAL=daily
+      - LOGROTATE_COPIES=7
+      - LOGROTATE_SIZE=10M
+      - LOGROTATE_CRONSCHEDULE=0 2 * * *
+      
+    volumes:
+      - trader_logs:/logs
+      - ./logs:/app-logs
+      
+    networks:
+      - trader_network
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 50M
+
+  # System monitor for Raspberry Pi
+  rpi-monitor:
+    image: michaelmiklis/rpi-monitor:latest
+    container_name: trader-rpi-monitor
+    restart: always
+    
+    ports:
+      - "8888:8888"
+      
+    volumes:
+      - /opt/vc:/opt/vc:ro
+      - /boot:/boot:ro
+      - /sys:/sys:ro
+      - /proc:/proc:ro
+      - /run/systemd:/run/systemd:ro
+      
+    devices:
+      - /dev/vchiq:/dev/vchiq
+      
+    networks:
+      - trader_network
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 50M
+
+  # Backup service (runs at night)
+  backup:
+    image: offen/docker-volume-backup:latest
+    container_name: trader-backup
+    restart: always
+    
+    environment:
+      - BACKUP_CRON_EXPRESSION=0 3 * * *  # Run at 3 AM
+      - BACKUP_FILENAME=trader-backup-%Y%m%d_%H%M%S.tar.gz
+      - BACKUP_RETENTION_DAYS=7  # Keep only 7 days on SD card
+      - BACKUP_PRUNING_PREFIX=trader-backup-
+      - BACKUP_STOP_CONTAINER_LABEL=trader
+      - AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      
+    volumes:
+      - trader_data:/backup/data:ro
+      - trader_logs:/backup/logs:ro
+      - redis_data:/backup/redis:ro
+      - ./backups:/archive
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      
+    networks:
+      - trader_network
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+
+volumes:
+  trader_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/pi/trader/data
+      
+  trader_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/pi/trader/logs
+      
+  trader_backups:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/pi/trader/backups
+      
+  prometheus_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/pi/trader/prometheus
+      
+  redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/pi/trader/redis
+
+networks:
+  trader_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
