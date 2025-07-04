@@ -243,11 +243,13 @@ class MarketScanner:
         
         # Volume indicators
         indicators['volume_sma'] = np.mean(volumes[-20:])
-        indicators['volume_ratio'] = volumes[-1] / indicators['volume_sma']
+        indicators['volume_ratio'] = volumes[-1] / indicators['volume_sma'] if indicators['volume_sma'] > 0 else 0
         
         # Volatility
-        returns = np.diff(closes) / closes[:-1]
-        indicators['volatility'] = np.std(returns[-20:]) * np.sqrt(365*24*12)  # Annualized for 5min
+        with np.errstate(divide='ignore', invalid='ignore'):
+            returns = np.diff(closes) / closes[:-1]
+            returns = returns[~np.isnan(returns) & ~np.isinf(returns)]
+        indicators['volatility'] = np.std(returns[-20:]) * np.sqrt(365*24*12) if len(returns) > 0 else 0  # Annualized for 5min
         
         return indicators
     
