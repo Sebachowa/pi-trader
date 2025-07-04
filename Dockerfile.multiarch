@@ -1,5 +1,5 @@
 # Multi-architecture Dockerfile (x86 + ARM)
-FROM --platform=$BUILDPLATFORM python:3.11-slim as builder
+FROM --platform=$BUILDPLATFORM python:3.13-slim as builder
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
@@ -30,7 +30,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] || [ "$TARGETPLATFORM" = "linux/arm
     fi
 
 # Runtime stage
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 WORKDIR /app
 
