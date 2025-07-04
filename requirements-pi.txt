@@ -3,10 +3,11 @@
 
 # Core trading library
 ccxt==4.1.10
+python-telegram-bot==20.2  # Telegram notifications
 
 # Async support
 aiohttp==3.9.1
-websockets==12.0
+asyncio-throttle==1.0.2
 
 # Numerical computing (lightweight alternatives)
 numpy==1.24.3
@@ -14,16 +15,15 @@ pandas==2.0.3  # For tax calculations
 
 # System monitoring
 psutil==5.9.6
-prometheus-client==0.19.0
 
 # HTTP requests for webhooks
 requests==2.31.0
 
 # Configuration
 python-dotenv==1.0.0  # Para cargar .env files
-pyyaml==6.0.1
 
-# Tax reporting (optional but recommended)
+# UI and logging
+colorama==0.4.6  # Colored terminal output
 rich==13.7.0  # For tax dashboard - can be omitted if not using dashboard
 
 # Optional: For better performance on Pi

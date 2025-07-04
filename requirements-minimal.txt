@@ -1,0 +1,24 @@
+# Minimal requirements for production on Raspberry Pi
+# Only essential dependencies, no development tools
+
+# Core trading
+ccxt>=4.0.0
+python-telegram-bot>=20.0
+
+# Async and networking
+aiohttp>=3.9.0
+asyncio-throttle>=1.0.0
+
+# Data analysis
+numpy>=1.24.0
+pandas>=2.0.0
+
+# System monitoring
+psutil>=5.9.0
+requests>=2.31.0
+
+# Configuration
+python-dotenv>=1.0.0
+
+# UI and logging
+colorama>=0.4.6
