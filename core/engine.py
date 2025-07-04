@@ -58,10 +58,7 @@ class TradingEngine:
         })
         self.tax_calculator = TaxCalculator(tax_config)
         
-        logging.basicConfig(
-            level=getattr(logging, self.config['monitoring']['log_level']),
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        )
+        # Logger already configured in run.py, just create our logger
         from core.logger import TradingLogger
         self.logger = TradingLogger.setup_logger(__name__)
     

@@ -109,8 +109,13 @@ class TradingLogger:
         logger = logging.getLogger(name)
         logger.setLevel(getattr(logging, log_level.upper()))
         
-        # Remove existing handlers
+        # Remove existing handlers to prevent duplicates
         logger.handlers = []
+        
+        # Prevent propagation to parent loggers to avoid duplicates
+        # Only propagate if this is the root logger
+        if name:  # If name is not empty (not root logger)
+            logger.propagate = False
         
         # Console handler with colors
         console_handler = logging.StreamHandler(sys.stdout)
