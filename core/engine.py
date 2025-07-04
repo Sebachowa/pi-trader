@@ -68,15 +68,20 @@ class TradingEngine:
         try:
             # Initialize exchange
             exchange_config = self.config['exchange']
+            # Create exchange instance
             self.exchange = getattr(ccxt, exchange_config['name'])({
                 'apiKey': exchange_config['api_key'],
                 'secret': exchange_config['api_secret'],
                 'enableRateLimit': True,
                 'options': {
-                    'defaultType': 'future',
-                    'testnet': exchange_config['testnet']
+                    'defaultType': 'spot',  # Use SPOT trading for testnet compatibility
+                    'adjustForTimeDifference': True  # Important for testnet
                 }
             })
+            
+            # Set testnet mode if enabled
+            if exchange_config.get('testnet', False):
+                self.exchange.set_sandbox_mode(True)
             
             # Initialize components
             self.risk_manager = RiskManager(self.config['risk'], self.config['trading'])

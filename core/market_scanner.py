@@ -60,10 +60,15 @@ class MarketScanner:
             'secret': api_secret,
             'enableRateLimit': True,
             'options': {
-                'defaultType': 'future',
-                'testnet': testnet
+                'defaultType': 'spot',  # Use SPOT trading for testnet compatibility
+                'adjustForTimeDifference': True  # Important for testnet
             }
         })
+        
+        # Set testnet mode if enabled
+        if testnet:
+            self.exchange.set_sandbox_mode(True)
+            
         await self.exchange.load_markets()
         logger.info(f"Scanner initialized with {len(self.exchange.markets)} markets")
         
