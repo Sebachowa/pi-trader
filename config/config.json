@@ -16,7 +16,7 @@
   "risk": {
     "max_drawdown_pct": 0.1,
     "max_position_size_usd": 1000,
-    "min_volume_24h": 1000000,
+    "min_volume_24h": 100000,
     "cooldown_minutes": 15
   },
   "monitoring": {
@@ -32,8 +32,8 @@
   },
   "scanner": {
     "interval_seconds": 30,
-    "min_volume_24h": 1000000,
-    "min_opportunity_score": 70,
+    "min_volume_24h": 100000,
+    "min_opportunity_score": 40,
     "max_concurrent_scans": 50,
     "symbol_selection": "auto",
     "whitelist": [],
