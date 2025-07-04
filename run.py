@@ -76,10 +76,10 @@ def main():
     
     # Setup logging
     setup_logging(args.log_level)
-    logger = logging.getLogger(__name__)
     
     # Import enhanced logger functions
     from core.logger import TradingLogger
+    logger = TradingLogger.setup_logger(__name__)
     
     # Register signal handlers
     signal.signal(signal.SIGINT, signal_handler)
