@@ -1,31 +1,36 @@
-# Raspberry Pi Trading Bot Requirements
-# Lightweight dependencies optimized for resource-constrained environments
-
-# Core trading
-ccxt>=4.0.0              # Cryptocurrency exchange integration
-python-telegram-bot>=20.0  # Telegram notifications
-
-# Async and networking
-aiohttp>=3.9.0           # Async HTTP client
-asyncio-throttle>=1.0.0  # Rate limiting
+# Nautilus AutoBot Requirements
+# Autonomous Trading System Built on Nautilus Trader
 
 # Data analysis
-numpy>=1.24.0            # Numerical computing
-pandas>=2.0.0            # Data manipulation (for tax calculations)
+pandas>=2.2.0
+numpy>=1.26.0
+scipy>=1.12.0
 
-# System monitoring
-psutil>=5.9.0            # System resource monitoring
-requests>=2.31.0         # HTTP requests for webhooks
+# Machine learning
+scikit-learn>=1.4.0
+tensorflow>=2.15.0  # For LSTM models
+xgboost>=2.0.0     # For gradient boosting
+
+# Async and networking
+asyncio-throttle>=1.0.0
+aiohttp>=3.9.0
+websockets>=12.0
 
 # Configuration
-python-dotenv>=1.0.0     # Environment variables
+pydantic>=2.5.0
+python-dotenv>=1.0.0
 
-# UI and logging
-colorama>=0.4.6          # Colored terminal output
-rich>=13.0.0             # Rich text formatting (for dashboards)
+# Monitoring and notifications
+prometheus-client>=0.19.0
+requests>=2.31.0  # For Telegram
 
-# Development tools (optional)
-pytest>=8.0.0            # Testing framework
-pytest-asyncio>=0.23.0   # Async test support
-black>=24.0.0            # Code formatter
-ruff>=0.2.0              # Linter
+# Utilities
+click>=8.1.0      # CLI
+tqdm>=4.66.0      # Progress bars
+colorama>=0.4.6   # Colored output
+
+# Development
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+black>=24.0.0
+ruff>=0.2.0

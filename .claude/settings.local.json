@@ -4,12 +4,12 @@
       "Bash(find:*)",
       "Bash(python:*)",
       "Bash(pip install:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git push:*)",
       "Bash(grep:*)",
       "Bash(mkdir:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(./cleanup_docs.sh:*)"
     ],
     "deny": []
   }
