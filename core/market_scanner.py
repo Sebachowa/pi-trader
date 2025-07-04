@@ -11,7 +11,8 @@ import numpy as np
 from collections import defaultdict
 import logging
 
-logger = logging.getLogger(__name__)
+from core.logger import TradingLogger
+logger = TradingLogger.setup_logger(__name__)
 
 
 @dataclass
@@ -127,7 +128,8 @@ class MarketScanner:
         self.scan_times.append(scan_time)
         self.last_scan = datetime.now()
         
-        logger.info(f"Scan completed in {scan_time:.2f}s, found {len(opportunities)} opportunities")
+        from core.logger import log_scanner_results
+        log_scanner_results(logger, len(opportunities), scan_time)
         
         self.opportunities = opportunities
         return opportunities

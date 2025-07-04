@@ -62,7 +62,8 @@ class TradingEngine:
             level=getattr(logging, self.config['monitoring']['log_level']),
             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         )
-        self.logger = logging.getLogger(__name__)
+        from core.logger import TradingLogger
+        self.logger = TradingLogger.setup_logger(__name__)
     
     def initialize(self):
         """Initialize exchange connection and components"""
@@ -258,9 +259,9 @@ class TradingEngine:
             
             self._process_signal(opp.symbol, signal, instrument)
             
-            self.logger.info(
-                f"Processed opportunity: {opp.symbol} - {opp.strategy} "
-                f"(score: {opp.score:.1f})"
+            from core.logger import TradingLogger
+            TradingLogger.log_opportunity(
+                self.logger, opp.symbol, opp.strategy, opp.score
             )
             
         except Exception as e:
@@ -360,7 +361,15 @@ class TradingEngine:
             
             # Place order
             if signal['action'] == 'BUY':
-                self.logger.info(f"Attempting to buy {position_size} {symbol}")
+                from core.logger import log_strategy_signal
+                log_strategy_signal(
+                    self.logger, 
+                    signal['strategy'], 
+                    signal['action'], 
+                    signal['score'] / 100.0
+                )
+                
+                self.logger.info(f"⚡ Executing BUY order: {position_size:.4f} {symbol}")
                 order = self.exchange.create_market_buy_order(symbol, position_size)
                 
                 # Record position
@@ -376,7 +385,10 @@ class TradingEngine:
                 )
                 self.positions[symbol] = position
                 
-                self.logger.info(f"✅ Opened position: {symbol} @ {order['price']}")
+                from core.logger import TradingLogger
+                TradingLogger.log_trade_opened(
+                    self.logger, symbol, position_size, order['price']
+                )
                 
             elif signal['action'] == 'SELL' and symbol in self.positions:
                 order = self.exchange.create_market_sell_order(

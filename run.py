@@ -22,27 +22,22 @@ def signal_handler(signum, frame):
 
 
 def setup_logging(log_level: str = "INFO"):
-    """Setup logging configuration"""
-    log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    log_file = f"logs/trader_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+    """Setup logging configuration with beautiful output"""
+    from core.logger import TradingLogger
     
     # Create logs directory if it doesn't exist
     os.makedirs('logs', exist_ok=True)
+    log_file = f"logs/trader_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
     
-    # Configure logging
-    logging.basicConfig(
-        level=getattr(logging, log_level.upper()),
-        format=log_format,
-        handlers=[
-            logging.FileHandler(log_file),
-            logging.StreamHandler(sys.stdout)
-        ]
-    )
+    # Setup root logger with our custom formatter
+    root_logger = TradingLogger.setup_logger('', log_level, log_file)
     
     # Set third-party loggers to WARNING
     logging.getLogger('ccxt').setLevel(logging.WARNING)
     logging.getLogger('urllib3').setLevel(logging.WARNING)
     logging.getLogger('requests').setLevel(logging.WARNING)
+    
+    return root_logger
 
 
 def main():
@@ -83,25 +78,27 @@ def main():
     setup_logging(args.log_level)
     logger = logging.getLogger(__name__)
     
+    # Import enhanced logger functions
+    from core.logger import TradingLogger
+    
     # Register signal handlers
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
     
-    logger.info("=" * 50)
-    logger.info("🤖 Raspberry Pi Trading Bot Starting")
+    # Beautiful startup logging
+    TradingLogger.log_startup(logger)
     logger.info(f"📁 Config: {args.config}")
     
     # Determine mode
     if args.demo:
-        mode = "DEMO (No API keys required)"
+        mode = "🎮 DEMO (No API keys required)"
         os.environ['DEMO_MODE'] = 'true'
     elif args.paper or args.dry_run:
-        mode = "PAPER TRADING"
+        mode = "📝 PAPER TRADING"
     else:
-        mode = "LIVE TRADING"
+        mode = "💰 LIVE TRADING"
     
-    logger.info(f"📊 Mode: {mode}")
-    logger.info("=" * 50)
+    logger.info(f"Mode: {mode}")
     
     try:
         # Run demo mode if requested

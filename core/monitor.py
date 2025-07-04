@@ -15,7 +15,8 @@ class Monitor:
     
     def __init__(self, config: dict):
         self.config = config
-        self.logger = logging.getLogger(__name__)
+        from core.logger import TradingLogger
+        self.logger = TradingLogger.setup_logger(__name__)
         self.stats = {
             'start_time': datetime.now(),
             'total_trades': 0,
@@ -43,12 +44,14 @@ class Monitor:
             if total_balance > self.stats['peak_equity']:
                 self.stats['peak_equity'] = total_balance
             
-            # Log status
-            self.logger.info(
-                f"System: CPU {cpu_percent}%, RAM {memory_percent}%, "
-                f"Disk {disk_usage}% | "
-                f"Positions: {len(positions)} | "
-                f"Equity: ${total_balance:.2f}"
+            # Log status with enhanced formatting
+            from core.logger import TradingLogger
+            TradingLogger.log_system_status(
+                self.logger,
+                cpu_percent,
+                memory_percent,
+                len(positions),
+                total_balance
             )
             
             # Send notification if enabled
