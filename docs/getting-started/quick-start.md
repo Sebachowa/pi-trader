@@ -20,7 +20,7 @@ python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
-./setup_pi.sh  # Or: pip install -r requirements-pi.txt
+pip install -r requirements.txt  # Or use scripts/deployment/setup_pi.sh
 
 # Run demo (no API keys needed)
 python run.py --demo

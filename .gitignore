@@ -66,3 +66,9 @@ temp/
 *.tmp
 *.bak
 *.swp
+
+# Keep root clean - don't add test files here
+test_*.py
+debug_*.py
+*_test.py
+*_debug.py

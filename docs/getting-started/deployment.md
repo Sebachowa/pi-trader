@@ -57,8 +57,8 @@ python3 -m venv venv
 source venv/bin/activate
 
 # Install dependencies
-./setup_pi.sh
-# Or manually: pip install -r requirements-pi.txt
+./scripts/deployment/setup_pi.sh
+# Or manually: pip install -r requirements.txt
 ```
 
 ### 4. Configure
@@ -261,7 +261,7 @@ ps aux | grep python
 ping api.binance.com
 
 # Check API connectivity
-python test_binance_testnet.py
+python tests/test_binance_testnet.py
 
 # Check disk space
 df -h /home

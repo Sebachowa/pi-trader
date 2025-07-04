@@ -1,0 +1,14 @@
+# Development dependencies
+# Install with: pip install -r requirements-dev.txt
+
+# Include main requirements
+-r requirements.txt
+
+# Development tools
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+black>=24.0.0
+ruff>=0.2.0
+
+# Optional performance tools
+rich>=13.0.0  # For tax dashboard and advanced displays

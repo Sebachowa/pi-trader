@@ -24,7 +24,7 @@ git clone https://github.com/Sebachowa/pi-trader.git
 cd pi-trader
 python3 -m venv venv
 source venv/bin/activate
-./setup_pi.sh  # Or: pip install -r requirements-pi.txt
+pip install -r requirements.txt  # Or use scripts/deployment/setup_pi.sh
 ```
 
 ### 2. Configure

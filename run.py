@@ -104,6 +104,7 @@ def main():
         # Run demo mode if requested
         if args.demo:
             logger.info("🎮 Starting DEMO mode...")
+            sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'examples'))
             from run_demo import main as demo_main
             import asyncio
             asyncio.run(demo_main())

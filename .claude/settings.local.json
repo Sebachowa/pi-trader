@@ -9,7 +9,10 @@
       "Bash(chmod:*)",
       "Bash(cp:*)",
       "Bash(mv:*)",
-      "Bash(./cleanup_docs.sh:*)"
+      "Bash(./cleanup_docs.sh:*)",
+      "Bash(rm:*)",
+      "Bash(ls:*)",
+      "Bash(./organize_files.sh)"
     ],
     "deny": []
   }
