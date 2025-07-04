@@ -1,8 +1,8 @@
 {
   "exchange": {
     "name": "binance",
-    "api_key": "",
-    "api_secret": "",
+    "api_key": "YOUR_API_KEY_HERE",
+    "api_secret": "YOUR_API_SECRET_HERE",
     "testnet": true
   },
   "trading": {
@@ -29,5 +29,26 @@
     "enabled": ["trend_following", "mean_reversion"],
     "timeframes": ["15m", "1h"],
     "default_lookback": 100
+  },
+  "scanner": {
+    "interval_seconds": 30,
+    "min_volume_24h": 1000000,
+    "min_opportunity_score": 70,
+    "max_concurrent_scans": 50,
+    "symbol_selection": "auto",
+    "whitelist": [],
+    "blacklist": ["BUSD/USDT", "USDC/USDT"],
+    "top_volume_count": 100
+  },
+  "tax": {
+    "enabled": true,
+    "jurisdiction": "USA",
+    "method": "FIFO",
+    "tax_year": 2024,
+    "short_term_rate": 0.35,
+    "long_term_rate": 0.15,
+    "long_term_days": 365,
+    "export_format": ["form_8949", "summary_json", "turbotax"],
+    "quarterly_estimates": true
   }
 }

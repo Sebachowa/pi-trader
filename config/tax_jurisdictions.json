@@ -1,0 +1,197 @@
+{
+  "USA": {
+    "description": "United States Federal Tax",
+    "method": "FIFO",
+    "short_term_rate": 0.35,
+    "long_term_rate": 0.15,
+    "long_term_days": 365,
+    "wash_sale_rule": true,
+    "wash_sale_days": 30,
+    "reporting_threshold": 0,
+    "forms": ["8949", "Schedule D"],
+    "quarterly_estimates": true,
+    "notes": "State taxes additional. Rates shown are maximum federal rates."
+  },
+  
+  "SPAIN": {
+    "description": "España - Impuesto sobre la Renta",
+    "method": "FIFO",
+    "short_term_rate": 0.26,
+    "long_term_rate": 0.26,
+    "long_term_days": 0,
+    "tax_brackets": [
+      {"from": 0, "to": 6000, "rate": 0.19},
+      {"from": 6000, "to": 50000, "rate": 0.21},
+      {"from": 50000, "to": 200000, "rate": 0.23},
+      {"from": 200000, "to": null, "rate": 0.26}
+    ],
+    "reporting_threshold": 1000,
+    "forms": ["Modelo 720", "Modelo 100"],
+    "quarterly_estimates": false,
+    "notes": "Declaración anual. Modelo 720 para activos en el extranjero > 50,000€"
+  },
+  
+  "GERMANY": {
+    "description": "Deutschland - Kapitalertragsteuer",
+    "method": "FIFO",
+    "short_term_rate": 0.26375,
+    "long_term_rate": 0,
+    "long_term_days": 365,
+    "tax_free_amount": 600,
+    "reporting_threshold": 600,
+    "forms": ["Anlage KAP"],
+    "quarterly_estimates": false,
+    "notes": "Tax-free after 1 year holding. €600 tax-free allowance per year."
+  },
+  
+  "UK": {
+    "description": "United Kingdom - Capital Gains Tax",
+    "method": "FIFO",
+    "short_term_rate": 0.20,
+    "long_term_rate": 0.20,
+    "long_term_days": 0,
+    "annual_exemption": 12300,
+    "reporting_threshold": 49200,
+    "forms": ["Self Assessment"],
+    "quarterly_estimates": false,
+    "notes": "£12,300 annual CGT allowance. Higher rate taxpayers pay 20%."
+  },
+  
+  "CANADA": {
+    "description": "Canada - Capital Gains Tax",
+    "method": "ACB",
+    "short_term_rate": 0.2675,
+    "long_term_rate": 0.2675,
+    "long_term_days": 0,
+    "inclusion_rate": 0.5,
+    "reporting_threshold": 0,
+    "forms": ["Schedule 3", "T1"],
+    "quarterly_estimates": false,
+    "notes": "50% of capital gains are taxable. Rate shown assumes 53.5% marginal rate."
+  },
+  
+  "PORTUGAL": {
+    "description": "Portugal - Cryptocurrency Tax",
+    "method": "FIFO",
+    "short_term_rate": 0.28,
+    "long_term_rate": 0.28,
+    "long_term_days": 365,
+    "reporting_threshold": 0,
+    "forms": ["Anexo G"],
+    "quarterly_estimates": false,
+    "notes": "28% flat rate on crypto gains. Held >365 days may qualify for exemption."
+  },
+  
+  "SINGAPORE": {
+    "description": "Singapore - No Capital Gains Tax",
+    "method": "FIFO",
+    "short_term_rate": 0,
+    "long_term_rate": 0,
+    "long_term_days": 0,
+    "reporting_threshold": null,
+    "forms": [],
+    "quarterly_estimates": false,
+    "notes": "No capital gains tax. Income tax may apply if trading as business."
+  },
+  
+  "SWITZERLAND": {
+    "description": "Switzerland - Wealth Tax Only",
+    "method": "FIFO",
+    "short_term_rate": 0,
+    "long_term_rate": 0,
+    "long_term_days": 0,
+    "wealth_tax": true,
+    "reporting_threshold": null,
+    "forms": ["Tax Declaration"],
+    "quarterly_estimates": false,
+    "notes": "No capital gains tax for individuals. Wealth tax applies. Professional traders taxed as income."
+  },
+  
+  "JAPAN": {
+    "description": "Japan - Miscellaneous Income",
+    "method": "AVERAGE",
+    "short_term_rate": 0.55,
+    "long_term_rate": 0.55,
+    "long_term_days": 0,
+    "reporting_threshold": 200000,
+    "forms": ["確定申告"],
+    "quarterly_estimates": false,
+    "notes": "Taxed as miscellaneous income up to 55%. ¥200,000 reporting threshold."
+  },
+  
+  "AUSTRALIA": {
+    "description": "Australia - Capital Gains Tax",
+    "method": "FIFO",
+    "short_term_rate": 0.45,
+    "long_term_rate": 0.225,
+    "long_term_days": 365,
+    "cgt_discount": 0.5,
+    "reporting_threshold": 0,
+    "forms": ["Tax Return"],
+    "quarterly_estimates": false,
+    "notes": "50% CGT discount for assets held >12 months. Rate depends on income."
+  },
+  
+  "NETHERLANDS": {
+    "description": "Netherlands - Box 3 Wealth Tax",
+    "method": "FIFO",
+    "short_term_rate": 0.31,
+    "long_term_rate": 0.31,
+    "long_term_days": 0,
+    "wealth_tax": true,
+    "tax_free_amount": 50650,
+    "reporting_threshold": 50650,
+    "forms": ["Box 3"],
+    "quarterly_estimates": false,
+    "notes": "Taxed on deemed income from wealth (Box 3). €50,650 tax-free in 2023."
+  },
+  
+  "MEXICO": {
+    "description": "México - Impuesto sobre la Renta",
+    "method": "FIFO",
+    "short_term_rate": 0.35,
+    "long_term_rate": 0.10,
+    "long_term_days": 0,
+    "reporting_threshold": 0,
+    "forms": ["Declaración Anual"],
+    "quarterly_estimates": false,
+    "notes": "10% flat rate on gains. Up to 35% if considered business income."
+  },
+  
+  "DUBAI": {
+    "description": "UAE - No Personal Income Tax",
+    "method": "FIFO",
+    "short_term_rate": 0,
+    "long_term_rate": 0,
+    "long_term_days": 0,
+    "reporting_threshold": null,
+    "forms": [],
+    "quarterly_estimates": false,
+    "notes": "No personal income tax or capital gains tax in UAE."
+  },
+  
+  "FRANCE": {
+    "description": "France - Prélèvement Forfaitaire Unique",
+    "method": "FIFO",
+    "short_term_rate": 0.30,
+    "long_term_rate": 0.30,
+    "long_term_days": 0,
+    "annual_allowance": 305,
+    "reporting_threshold": 305,
+    "forms": ["Formulaire 2086"],
+    "quarterly_estimates": false,
+    "notes": "30% flat tax (12.8% income tax + 17.2% social charges). €305 annual allowance."
+  },
+  
+  "ITALY": {
+    "description": "Italia - Imposta sui Redditi",
+    "method": "FIFO",
+    "short_term_rate": 0.26,
+    "long_term_rate": 0.26,
+    "long_term_days": 0,
+    "reporting_threshold": 51645,
+    "forms": ["Modello RW"],
+    "quarterly_estimates": false,
+    "notes": "26% flat rate on crypto gains. RW form required for holdings > €51,645."
+  }
+}

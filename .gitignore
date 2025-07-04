@@ -22,7 +22,9 @@ autonomous_state.json
 telegram_config.json
 *_api_keys.json
 .env
-.env.local
+.env.*
+!.env.example
+config/config.local.json
 credentials/
 secrets/
 

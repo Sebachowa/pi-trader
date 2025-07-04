@@ -1,167 +1,221 @@
-# 🤖 Trading Systems Portfolio
+# 🤖 Raspberry Pi Crypto Trader
 
-Este repositorio contiene un portfolio completo de sistemas de trading automatizado, diseñado para operar 24/7 con mínima intervención humana.
+A lightweight, 24/7 autonomous cryptocurrency trading system optimized for Raspberry Pi deployment.
 
-## 🏗️ Arquitectura del Sistema
+## 🎯 Features
+
+- **Lightweight**: Optimized for ARM architecture and resource-constrained environments
+- **24/7 Autonomous Operation**: Runs continuously without manual intervention
+- **Multiple Strategies**: Trend following, mean reversion, and more
+- **Real-time Monitoring**: Web dashboard for monitoring positions and performance
+- **Risk Management**: Built-in position sizing and risk controls
+- **Easy Deployment**: Automated deployment with GitHub Actions
+- **Paper Trading**: Test strategies safely before going live
+- **Tax Calculation**: Automatic tax tracking and reporting for 15+ jurisdictions
+- **Smart Market Scanner**: Finds best opportunities across 100+ pairs every 30 seconds
+
+## 📊 Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                   SISTEMA PRINCIPAL                      │
-│              autonomous_trading (Nautilus)               │
-│  • ML/AI Strategy Selection                              │
-│  • Advanced Risk Management                              │
-│  • Self-healing capabilities                             │
-│  • Target: 10% annual returns                            │
-└─────────────────────────────────────────────────────────┘
-                          ↕️
-┌─────────────────────────────────────────────────────────┐
-│                    SISTEMA EDGE                          │
-│                trader-pi (Raspberry Pi)                  │
-│  • Lightweight CCXT-based                                │
-│  • Basic strategies                                      │
-│  • Remote monitoring                                     │
-│  • Backup trading capability                             │
-└─────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────┐
+│           AUTONOMOUS TRADER 24/7            │
+├─────────────────────────────────────────────┤
+│  1. MARKET SCANNER                          │
+│     • Monitors multiple pairs               │
+│     • Detects trading opportunities         │
+├─────────────────────────────────────────────┤
+│  2. STRATEGY ENGINE                         │
+│     • Trend Following                       │
+│     • Mean Reversion                        │
+│     • Custom Strategies                     │
+├─────────────────────────────────────────────┤
+│  3. RISK MANAGER                            │
+│     • Position Sizing                       │
+│     • Stop Loss/Take Profit                 │
+│     • Portfolio Limits                      │
+├─────────────────────────────────────────────┤
+│  4. MONITORING                              │
+│     • Real-time Dashboard                   │
+│     • Performance Metrics                   │
+│     • Alert System                          │
+└─────────────────────────────────────────────┘
 ```
-
-## 📁 Estructura del Proyecto
-
-### 🎯 Sistema Principal: `autonomous_trading/`
-Sistema profesional completo basado en Nautilus Trader para servidores/workstations.
-
-**Características:**
-- ✅ ML-powered strategy selection
-- ✅ Multi-asset support (crypto, stocks, forex)
-- ✅ Advanced risk management with Kelly Criterion
-- ✅ Self-healing and auto-recovery
-- ✅ Paper trading capabilities
-- ✅ Comprehensive monitoring
-
-**Uso:**
-```bash
-./start_autonomous_trading.sh
-```
-
-### 📱 Sistema Edge: `trader-pi/`
-Sistema ligero optimizado para dispositivos de recursos limitados.
-
-**Características:**
-- ✅ Optimizado para ARM (Raspberry Pi)
-- ✅ Consumo mínimo de recursos (<1GB RAM)
-- ✅ Estrategias básicas pero efectivas
-- ✅ Deployment automático con GitHub Actions
-- ✅ Monitoreo remoto
-
-**Deployment:**
-```bash
-cd trader-pi
-make deploy
-```
-
-### 📊 Sistemas Adicionales
-
-- **`paper_trading/`** - Motor de simulación realista
-- **`multi_asset_system/`** - Sistema unificado multi-activos
-- **`deployment/`** - Scripts y configuraciones de deployment
 
 ## 🚀 Quick Start
 
-### Opción 1: Sistema Principal (Producción)
-```bash
-# Configurar
-cp autonomous_trading/config/trading_config.json.example autonomous_trading/config/trading_config.json
-# Editar configuración...
+### Prerequisites
 
-# Ejecutar
-./start_autonomous_trading.sh
+- Raspberry Pi 5 (8GB+ RAM recommended)
+- Python 3.11+
+- Exchange API keys (Binance, Bybit, etc.)
+- Stable internet connection
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/trader.git
+cd trader
 ```
 
-### Opción 2: Sistema Raspberry Pi
+2. Install dependencies:
 ```bash
-# En tu Raspberry Pi
-cd trader-pi
-python3 -m venv venv
-source venv/bin/activate
 pip install -r requirements-pi.txt
-python3 run.py --paper
 ```
 
-## 🔧 Configuración
-
-### Variables de Entorno
+3. Configure your settings:
 ```bash
-# Binance
-export BINANCE_API_KEY="your-key"
-export BINANCE_API_SECRET="your-secret"
-
-# Notificaciones (opcional)
-export TELEGRAM_BOT_TOKEN="your-token"
-export TELEGRAM_CHAT_ID="your-chat-id"
+cp config/config.example.json config/config.json
+# Edit config/config.json with your API keys and preferences
 ```
 
-## 📈 Estrategias Disponibles
-
-| Estrategia | Sistema Principal | Sistema Pi | Descripción |
-|------------|------------------|-------------|-------------|
-| Trend Following | ✅ Advanced | ✅ Simple | Sigue tendencias del mercado |
-| Mean Reversion | ✅ ML-enhanced | ✅ Bollinger | Aprovecha reversiones |
-| Momentum | ✅ Multi-timeframe | ✅ RSI-based | Trading de momentum |
-| Market Making | ✅ Advanced | ❌ | Provee liquidez |
-| ML Strategy | ✅ Ensemble | ❌ | Estrategias con IA |
-
-## 🛡️ Risk Management
-
-Ambos sistemas implementan:
-- Stop-loss dinámico
-- Position sizing basado en volatilidad
-- Límites de drawdown diario
-- Circuit breakers automáticos
-
-## 📊 Monitoreo
-
-### Sistema Principal
-- Logs detallados en `logs/`
-- Métricas en tiempo real
-- Dashboard web (opcional)
-
-### Sistema Pi
+4. Run the trader:
 ```bash
-# Monitoreo remoto
-make logs
-make status
+python run.py
 ```
 
-## 🔄 CI/CD
+## 📱 Monitoring Dashboard
 
-### GitHub Actions
-El repositorio incluye workflows para:
-- ✅ Tests automáticos
-- ✅ Deployment a Raspberry Pi
-- ✅ Notificaciones de deployment
-- ✅ Rollback automático
+Access the web dashboard at `http://your-pi-ip:8080` to monitor:
 
-## 📚 Documentación Adicional
+- Current positions
+- P&L in real-time
+- Trading history
+- System health
+- Risk metrics
 
-- [Deployment Guide](trader-pi/DEPLOYMENT.md) - Guía completa de deployment
-- [Architecture](architecture/system_design.py) - Diseño del sistema
-- [Trading Strategies](autonomous_trading/strategies/) - Implementación de estrategias
+## 🔧 Configuration
 
-## 🤝 Contribuir
+### Exchange Configuration
+```json
+{
+  "exchange": {
+    "name": "binance",
+    "api_key": "your_api_key",
+    "api_secret": "your_api_secret",
+    "testnet": true
+  }
+}
+```
 
-1. Fork el repositorio
-2. Crea tu feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add AmazingFeature'`)
-4. Push al branch (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+### Risk Management
+```json
+{
+  "risk": {
+    "max_position_size": 0.1,
+    "max_positions": 3,
+    "stop_loss_percent": 0.02,
+    "take_profit_percent": 0.03
+  }
+}
+```
 
-## 📄 Licencia
+### Strategy Settings
+```json
+{
+  "strategies": {
+    "enabled": ["trend_following", "mean_reversion"],
+    "timeframes": ["5m", "15m", "1h"]
+  }
+}
+```
 
-Este proyecto está bajo la Licencia MIT - ver [LICENSE](LICENSE) para detalles.
+## 🚢 Deployment
+
+### Option 1: Direct Deployment
+
+```bash
+./deploy_to_pi.sh
+```
+
+### Option 2: GitHub Actions (Recommended)
+
+1. Fork this repository
+2. Add secrets to your GitHub repository:
+   - `PI_HOST`: Your Raspberry Pi IP
+   - `PI_USER`: SSH username
+   - `PI_SSH_KEY`: SSH private key
+3. Push to main branch to trigger deployment
+
+### Option 3: Docker
+
+```bash
+docker-compose up -d
+```
+
+## 📈 Performance Expectations
+
+With $1,000 initial capital:
+- **Monthly**: 3-8% ($30-80)
+- **Annual**: 40-100% ($400-1000)
+- **Max Drawdown**: 10% ($100)
+
+## 🛡️ Security
+
+- API keys stored securely in environment variables
+- No keys in code or logs
+- IP whitelist on exchange
+- 2FA recommended on exchange account
+
+## 📊 Monitoring and Alerts
+
+Configure Telegram notifications:
+```bash
+cp telegram_config.example.json telegram_config.json
+# Add your bot token and chat ID
+```
+
+Receive alerts for:
+- New positions opened/closed
+- Daily P&L summary
+- System errors
+- Risk limit warnings
+
+## 💰 Tax Features
+
+Automatic tax calculation and optimization:
+
+```bash
+# Real-time tax monitoring
+python scripts/tax_dashboard.py
+
+# Generate annual tax report
+python scripts/generate_tax_report.py --year 2024
+
+# Estimate quarterly payments
+python scripts/generate_tax_report.py --estimate
+```
+
+Features:
+- **Multi-jurisdiction support** (USA, Spain, Germany, UK, etc.)
+- **Real-time tax impact** before closing positions
+- **Tax loss harvesting** suggestions
+- **Form 8949** export for US taxes
+- **TurboTax** compatible exports
+
+[See full tax documentation](docs/TAX_FEATURES.md)
+
+## 🔍 Troubleshooting
+
+Check logs:
+```bash
+tail -f logs/trader.log
+```
+
+System status:
+```bash
+systemctl status trader
+```
+
+Health check:
+```bash
+python scripts/health_check.py
+```
+
+## 📝 License
+
+MIT License - see LICENSE file for details
 
 ## ⚠️ Disclaimer
 
-Este software es para fines educativos. El trading conlleva riesgos significativos. Úsalo bajo tu propia responsabilidad.
-
----
-
-**Desarrollado para operar 24/7 con mínima intervención humana** 🚀
+Trading cryptocurrencies carries risk. This software is provided as-is without warranty. Always test with small amounts first and never invest more than you can afford to lose.
