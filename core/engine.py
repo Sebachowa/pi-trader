@@ -17,6 +17,7 @@ from core.risk import RiskManager
 from core.monitor import Monitor
 from core.trading_metrics import Position, TradingMetrics
 from core.market_scanner import MarketScanner, MarketOpportunity
+from core.testnet_scanner import TestnetScanner
 from core.tax_calculator import TaxCalculator
 
 
@@ -150,7 +151,11 @@ class TradingEngine:
     async def _initialize_scanner(self):
         """Initialize the market scanner"""
         exchange_config = self.config['exchange']
-        self.scanner = MarketScanner(
+        
+        # Use TestnetScanner for testnet mode
+        scanner_class = TestnetScanner if exchange_config.get('testnet', False) else MarketScanner
+        
+        self.scanner = scanner_class(
             exchange_name=exchange_config['name'],
             max_concurrent=50
         )
@@ -159,7 +164,8 @@ class TradingEngine:
             api_secret=exchange_config['api_secret'],
             testnet=exchange_config['testnet']
         )
-        self.logger.info("Market scanner initialized")
+        scanner_type = "Testnet scanner" if exchange_config.get('testnet', False) else "Market scanner"
+        self.logger.info(f"{scanner_type} initialized")
     
     async def _scanner_loop(self):
         """Run continuous market scanning"""
