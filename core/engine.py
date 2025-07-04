@@ -245,7 +245,8 @@ class TradingEngine:
                 'stop_loss': opp.stop_loss,
                 'take_profit': opp.take_profit,
                 'strategy': opp.strategy,
-                'score': opp.score
+                'score': opp.score,
+                'price': opp.entry_price  # Add price for position sizing
             }
             
             # Process the signal
@@ -344,17 +345,22 @@ class TradingEngine:
                 return
             
             # Calculate position size
+            balance = self.exchange.fetch_balance()
             position_size = self.risk_manager.calculate_position_size(
                 symbol, 
                 signal, 
-                self.exchange.fetch_balance()
+                balance
             )
             
+            self.logger.info(f"Calculated position size for {symbol}: {position_size}")
+            
             if position_size < instrument['min_order_size']:
+                self.logger.warning(f"Position size {position_size} < min order size {instrument['min_order_size']} for {symbol}")
                 return
             
             # Place order
             if signal['action'] == 'BUY':
+                self.logger.info(f"Attempting to buy {position_size} {symbol}")
                 order = self.exchange.create_market_buy_order(symbol, position_size)
                 
                 # Record position
@@ -370,7 +376,7 @@ class TradingEngine:
                 )
                 self.positions[symbol] = position
                 
-                self.logger.info(f"Opened position: {symbol} @ {order['price']}")
+                self.logger.info(f"✅ Opened position: {symbol} @ {order['price']}")
                 
             elif signal['action'] == 'SELL' and symbol in self.positions:
                 order = self.exchange.create_market_sell_order(
