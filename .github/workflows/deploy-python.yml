@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@v3
       
       - name: Deploy to Raspberry Pi
-        uses: appleboy/ssh-action@v0.1.5
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.PI_HOST }}
           username: ${{ secrets.PI_USER }}
@@ -67,7 +67,7 @@ jobs:
             echo "✅ Deployment complete!"
       
       - name: Health Check
-        uses: appleboy/ssh-action@v0.1.5
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.PI_HOST }}
           username: ${{ secrets.PI_USER }}
