@@ -40,6 +40,11 @@ Deep dive into how the bot works:
    - Emoji reference and meanings
    - Monitoring and debugging
 
+4. **[Troubleshooting Guide](troubleshooting.md)** 🔧
+   - Diagnose why bot isn't finding opportunities
+   - View historical logs and data
+   - Common issues and solutions
+
 ## 🎯 Features
 
 Understanding what the bot can do:
