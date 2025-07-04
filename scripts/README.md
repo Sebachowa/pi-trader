@@ -1,21 +1,31 @@
 # 📜 Scripts
 
-Utility and deployment scripts.
+Essential scripts for deployment and operation.
 
-## Structure
-- `deployment/` - Deployment and setup scripts
-  - `deploy_to_pi.sh` - Deploy to Raspberry Pi
-  - `setup_pi.sh` - Initial Pi setup
-- `utils/` - Utility scripts
-  - `debug_scanner.py` - Debug scanner issues
-  - `debug_opportunity.py` - Debug opportunity detection
-  - `cleanup_docs.sh` - Clean up documentation
+## Essential Scripts
+
+### 🚀 Deployment
+- `deployment/deploy_to_pi.sh` - Deploy updates to Raspberry Pi
+- `deployment/setup_pi.sh` - Initial Raspberry Pi setup
+
+### 🏥 Monitoring
+- `health_check.py` - Check bot health and status
+
+### 💰 Tax Reporting
+- `generate_tax_report.py` - Generate tax reports and export forms
 
 ## Usage
+
 ```bash
+# Initial Pi setup
+./scripts/deployment/setup_pi.sh
+
 # Deploy to Pi
 ./scripts/deployment/deploy_to_pi.sh
 
-# Debug scanner
-python scripts/utils/debug_scanner.py
+# Check bot health
+python scripts/health_check.py
+
+# Generate tax report
+python scripts/generate_tax_report.py
 ```
