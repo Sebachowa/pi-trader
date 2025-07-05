@@ -6,23 +6,36 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted  # Tu Raspberry Pi!
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Update code
+      - name: Clean runner workspace
         run: |
-          # Ya estamos en la Pi!
+          # Clean the runner's workspace to avoid conflicts
+          rm -rf ${{ github.workspace }}/*
+          
+      - name: Deploy to bot directory
+        run: |
+          echo "🚀 Deploying to pi-trader..."
+          
+          # Go to the actual bot directory
           cd ~/code/pi-trader
+          
+          # Save local config
+          cp config/config.json config/config.json.backup
+          
+          # Pull latest changes
           git pull origin main
-      
-      - name: Install dependencies
-        run: |
-          cd ~/code/pi-trader
+          
+          # Restore local config (with API keys)
+          cp config/config.json.backup config/config.json
+          rm config/config.json.backup
+          
+          # Update dependencies
           source venv/bin/activate
           pip install -r requirements-pi.txt
-      
-      - name: Restart bot
-        run: |
-          sudo systemctl restart trader || echo "Service not yet configured"
-          echo "✅ Deployed locally on Pi!"
+          
+          # Restart service
+          sudo systemctl restart trader || echo "Service not configured"
+          
+          echo "✅ Deployed successfully!"
+          echo "📊 Check logs: sudo journalctl -u trader -f"

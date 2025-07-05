@@ -23,6 +23,7 @@ autonomous_state.json
 .env
 .env.*
 !.env.example
+config/config.json
 config/config.local.json
 credentials/
 secrets/
