@@ -2,235 +2,30 @@ name: Deploy to Raspberry Pi
 
 on:
   push:
-    branches: [main, deploy]
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Deployment environment'
-        required: true
-        default: 'production'
-        type: choice
-        options:
-          - production
-          - staging
-
-env:
-  SERVICE_NAME: trader
-  DEPLOY_PATH: /home/pi/trader
-  BACKUP_PATH: /home/pi/backups
+    branches: [main]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Run tests
-        run: npm test
-      
-      - name: Run type check
-        run: npm run typecheck
-      
-      - name: Run lint
-        run: npm run lint
-
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Build project
-        run: npm run build
-      
-      - name: Create deployment package
-        run: |
-          mkdir -p deployment
-          cp -r dist deployment/
-          cp -r src deployment/
-          cp package*.json deployment/
-          cp -r scripts deployment/
-          [ -f .env.example ] && cp .env.example deployment/
-          tar -czf deployment.tar.gz deployment/
-      
-      - name: Upload deployment artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: deployment-package
-          path: deployment.tar.gz
-          retention-days: 7
-
   deploy:
-    needs: build
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment || 'production' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       
-      - name: Download deployment artifact
-        uses: actions/download-artifact@v4
+      - name: Deploy to Pi
+        uses: appleboy/ssh-action@v0.1.5
         with:
-          name: deployment-package
-      
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
-          chmod 644 ~/.ssh/known_hosts
-      
-      - name: Create backup on Pi
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            if [ -d "${{ env.DEPLOY_PATH }}" ]; then
-              mkdir -p "${{ env.BACKUP_PATH }}"
-              BACKUP_NAME="${{ env.SERVICE_NAME }}-$(date +%Y%m%d-%H%M%S).tar.gz"
-              tar -czf "${{ env.BACKUP_PATH }}/${BACKUP_NAME}" -C "${{ env.DEPLOY_PATH }}" .
-              
-              # Keep only last 5 backups
-              cd "${{ env.BACKUP_PATH }}"
-              ls -t ${{ env.SERVICE_NAME }}-*.tar.gz | tail -n +6 | xargs -r rm
-            fi
-          EOF
-      
-      - name: Deploy to Raspberry Pi
-        run: |
-          # Copy deployment package
-          scp deployment.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/
-          
-          # Extract and deploy
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            set -e
-            
-            # Extract deployment package
-            cd /tmp
-            tar -xzf deployment.tar.gz
-            
-            # Stop service if running
-            sudo systemctl is-active --quiet ${{ env.SERVICE_NAME }} && sudo systemctl stop ${{ env.SERVICE_NAME }} || true
-            
-            # Create deploy directory if not exists
-            mkdir -p ${{ env.DEPLOY_PATH }}
-            
-            # Deploy new version
-            rsync -av --delete /tmp/deployment/ ${{ env.DEPLOY_PATH }}/
-            
-            # Set permissions
-            chmod +x ${{ env.DEPLOY_PATH }}/scripts/*.sh
+          host: ${{ secrets.PI_HOST }}
+          username: ${{ secrets.PI_USER }}
+          key: ${{ secrets.PI_SSH_KEY }}
+          script: |
+            # Update code
+            cd ~/trader
+            git pull origin main
             
             # Install dependencies
-            cd ${{ env.DEPLOY_PATH }}
-            npm ci --production
+            source venv/bin/activate
+            pip install -r requirements-pi.txt
             
-            # Copy environment file if exists
-            if [ -f "${{ env.DEPLOY_PATH }}/.env.production" ]; then
-              cp "${{ env.DEPLOY_PATH }}/.env.production" "${{ env.DEPLOY_PATH }}/.env"
-            fi
+            # Restart bot
+            sudo systemctl restart trader
             
-            # Start service
-            sudo systemctl start ${{ env.SERVICE_NAME }}
-            
-            # Cleanup
-            rm -rf /tmp/deployment /tmp/deployment.tar.gz
-          EOF
-      
-      - name: Health check
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            cd ${{ env.DEPLOY_PATH }}
-            ./scripts/health_check.sh
-          EOF
-      
-      - name: Cleanup SSH
-        if: always()
-        run: rm -rf ~/.ssh/id_rsa
-
-  notify:
-    needs: [test, build, deploy]
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
-      - name: Send Discord notification
-        if: ${{ secrets.DISCORD_WEBHOOK }}
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        run: |
-          if [ "${{ needs.deploy.result }}" == "success" ]; then
-            COLOR="3066993"  # Green
-            TITLE="✅ Deployment Successful"
-            DESCRIPTION="Successfully deployed to Raspberry Pi"
-          else
-            COLOR="15158332"  # Red
-            TITLE="❌ Deployment Failed"
-            DESCRIPTION="Deployment to Raspberry Pi failed"
-          fi
-          
-          curl -H "Content-Type: application/json" \
-               -d "{
-                 \"embeds\": [{
-                   \"title\": \"$TITLE\",
-                   \"description\": \"$DESCRIPTION\",
-                   \"color\": $COLOR,
-                   \"fields\": [
-                     {
-                       \"name\": \"Repository\",
-                       \"value\": \"${{ github.repository }}\",
-                       \"inline\": true
-                     },
-                     {
-                       \"name\": \"Branch\",
-                       \"value\": \"${{ github.ref_name }}\",
-                       \"inline\": true
-                     },
-                     {
-                       \"name\": \"Commit\",
-                       \"value\": \"[\`${{ github.sha }}\`](${{ github.event.head_commit.url }})\",
-                       \"inline\": false
-                     }
-                   ],
-                   \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%S.000Z)\"
-                 }]
-               }" \
-               $DISCORD_WEBHOOK
-      
-      - name: Send Slack notification
-        if: ${{ secrets.SLACK_WEBHOOK }}
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        run: |
-          if [ "${{ needs.deploy.result }}" == "success" ]; then
-            STATUS="✅ Success"
-            COLOR="good"
-          else
-            STATUS="❌ Failed"
-            COLOR="danger"
-          fi
-          
-          curl -X POST -H 'Content-type: application/json' \
-               --data "{
-                 \"attachments\": [{
-                   \"color\": \"$COLOR\",
-                   \"title\": \"Deployment $STATUS\",
-                   \"text\": \"Repository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nCommit: ${{ github.sha }}\"
-                 }]
-               }" \
-               $SLACK_WEBHOOK
+            echo "✅ Deployed!"
