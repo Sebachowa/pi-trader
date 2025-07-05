@@ -20,15 +20,14 @@ jobs:
           # Go to the actual bot directory
           cd ~/code/pi-trader
           
-          # Save local config
-          cp config/config.json config/config.json.backup
+          # Stash local changes (config with API keys)
+          git stash
           
           # Pull latest changes
           git pull origin main
           
           # Restore local config (with API keys)
-          cp config/config.json.backup config/config.json
-          rm config/config.json.backup
+          git stash pop || echo "No stash to apply"
           
           # Update dependencies
           source venv/bin/activate
