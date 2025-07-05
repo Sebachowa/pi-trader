@@ -19,6 +19,7 @@ from core.trading_metrics import Position, TradingMetrics
 from core.market_scanner import MarketScanner, MarketOpportunity
 from core.testnet_scanner import TestnetScanner
 from core.tax_calculator import TaxCalculator
+from core.telegram_notifier import TelegramNotifier
 
 
 class TradingEngine:
@@ -61,6 +62,12 @@ class TradingEngine:
         # Logger already configured in run.py, just create our logger
         from core.logger import TradingLogger
         self.logger = TradingLogger.setup_logger(__name__)
+        
+        # Initialize Telegram notifier
+        telegram_config = self.config.get('telegram', {})
+        bot_token = telegram_config.get('bot_token', '')
+        chat_id = telegram_config.get('chat_id', '')
+        self.telegram = TelegramNotifier(bot_token, chat_id)
     
     def initialize(self):
         """Initialize exchange connection and components"""
@@ -261,6 +268,17 @@ class TradingEngine:
                 self.logger, opp.symbol, opp.strategy, opp.score
             )
             
+            # Send Telegram notification
+            notification_data = {
+                'symbol': opp.symbol,
+                'strategy': opp.strategy,
+                'score': opp.score,
+                'entry_price': opp.entry_price,
+                'expected_return': opp.expected_return,
+                'volume_24h': opp.volume_24h
+            }
+            self.telegram.send_sync(self.telegram.format_opportunity(notification_data))
+            
         except Exception as e:
             self.logger.error(f"Error processing opportunity: {e}")
     
@@ -387,6 +405,19 @@ class TradingEngine:
                     self.logger, symbol, position_size, order['price']
                 )
                 
+                # Send Telegram notification for opened trade
+                trade_data = {
+                    'symbol': symbol,
+                    'side': 'buy',
+                    'entry_price': order['price'],
+                    'amount': position_size,
+                    'stop_loss': signal.get('stop_loss', 0),
+                    'stop_loss_pct': ((signal.get('stop_loss', 0) - order['price']) / order['price'] * 100) if signal.get('stop_loss') else 0,
+                    'take_profit': signal.get('take_profit', 0),
+                    'take_profit_pct': ((signal.get('take_profit', 0) - order['price']) / order['price'] * 100) if signal.get('take_profit') else 0
+                }
+                self.telegram.send_sync(self.telegram.format_trade_opened(trade_data))
+                
             elif signal['action'] == 'SELL' and symbol in self.positions:
                 order = self.exchange.create_market_sell_order(
                     symbol, 
@@ -470,6 +501,18 @@ class TradingEngine:
             })
             
             self.logger.info(f"Position closed ({reason}): {symbol} @ {order['price']}, PnL: ${position.pnl:.2f} ({position.pnl_percentage:.2f}%)")
+            
+            # Send Telegram notification for closed trade
+            trade_closed_data = {
+                'symbol': symbol,
+                'entry_price': position.entry_price,
+                'exit_price': position.current_price,
+                'pnl': position.pnl,
+                'pnl_pct': position.pnl_percentage,
+                'duration': str(datetime.now() - position.opened_at)
+            }
+            self.telegram.send_sync(self.telegram.format_trade_closed(trade_closed_data))
+            
             del self.positions[symbol]
             
         except Exception as e:
