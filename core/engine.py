@@ -176,7 +176,7 @@ class TradingEngine:
         
         self.scanner = scanner_class(
             exchange_name=exchange_config['name'],
-            max_concurrent=50
+            max_concurrent=100  # High concurrency for 400+ pairs
         )
         await self.scanner.initialize(
             api_key=exchange_config['api_key'],
