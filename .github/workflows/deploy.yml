@@ -29,9 +29,12 @@ jobs:
           # Restore local config (with API keys)
           git stash pop || echo "No stash to apply"
           
+          # Clean up any backup files
+          rm -f config/config.json.backup
+          
           # Update dependencies
           source venv/bin/activate
-          pip install -r requirements-pi.txt
+          pip install -r requirements.txt
           
           # Restart service
           sudo systemctl restart trader || echo "Service not configured"
