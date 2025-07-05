@@ -18,14 +18,16 @@ from core.monitor import Monitor
 from core.trading_metrics import Position, TradingMetrics
 from core.market_scanner import MarketScanner, MarketOpportunity
 from core.testnet_scanner import TestnetScanner
+from core.aggressive_testnet_scanner import AggressiveTestnetScanner
 from core.tax_calculator import TaxCalculator
 from core.telegram_notifier import TelegramNotifier
+from core.paper_trading_engine import PaperTradingEngine
 
 
 class TradingEngine:
     """Simplified trading engine for resource-constrained environments"""
     
-    def __init__(self, config_path: str = "config/config.json"):
+    def __init__(self, config_path: str = "config/config.json", paper_trading: bool = False):
         self.config = ConfigLoader.load(config_path)
         
         # Validate configuration
@@ -38,6 +40,8 @@ class TradingEngine:
         self.strategies = {}
         self.positions: Dict[str, Position] = {}
         self.running = False
+        self.paper_trading = paper_trading
+        self.paper_engine = None
         
         # Performance tracking
         self.trade_history = deque(maxlen=1000)
@@ -86,8 +90,13 @@ class TradingEngine:
             })
             
             # Set testnet mode if enabled
-            if exchange_config.get('testnet', False):
+            if exchange_config.get('testnet', False) and not self.paper_trading:
                 self.exchange.set_sandbox_mode(True)
+            
+            # Initialize paper trading if enabled
+            if self.paper_trading:
+                self.paper_engine = PaperTradingEngine(self.initial_balance)
+                self.logger.info("📝 Paper Trading Mode Enabled - Using REAL market data with simulated trades")
             
             # Initialize components
             self.risk_manager = RiskManager(self.config['risk'], self.config['trading'])
@@ -157,8 +166,13 @@ class TradingEngine:
         """Initialize the market scanner"""
         exchange_config = self.config['exchange']
         
-        # Use TestnetScanner for testnet mode
-        scanner_class = TestnetScanner if exchange_config.get('testnet', False) else MarketScanner
+        # Use AggressiveTestnetScanner for testnet mode
+        if exchange_config.get('testnet', False):
+            scanner_class = AggressiveTestnetScanner
+            scanner_type = "🚀 Aggressive Testnet scanner"
+        else:
+            scanner_class = MarketScanner
+            scanner_type = "Market scanner"
         
         self.scanner = scanner_class(
             exchange_name=exchange_config['name'],
@@ -169,8 +183,7 @@ class TradingEngine:
             api_secret=exchange_config['api_secret'],
             testnet=exchange_config['testnet']
         )
-        scanner_type = "Testnet scanner" if exchange_config.get('testnet', False) else "Market scanner"
-        self.logger.info(f"{scanner_type} initialized")
+        self.logger.info(f"{scanner_type} initialized - Will find more opportunities!")
     
     async def _scanner_loop(self):
         """Run continuous market scanning"""
@@ -385,7 +398,13 @@ class TradingEngine:
                 )
                 
                 self.logger.info(f"⚡ Executing BUY order: {position_size:.4f} {symbol}")
-                order = self.exchange.create_market_buy_order(symbol, position_size)
+                
+                # Execute order (paper or real)
+                if self.paper_trading:
+                    ticker = self.exchange.fetch_ticker(symbol)
+                    order = self.paper_engine.create_market_buy_order(symbol, position_size, ticker['last'])
+                else:
+                    order = self.exchange.create_market_buy_order(symbol, position_size)
                 
                 # Record position
                 position = Position(

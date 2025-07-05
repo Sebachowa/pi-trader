@@ -32,13 +32,13 @@
   },
   "scanner": {
     "interval_seconds": 30,
-    "min_volume_24h": 100000,
-    "min_opportunity_score": 40,
+    "min_volume_24h": 1000,
+    "min_opportunity_score": 25,
     "max_concurrent_scans": 50,
     "symbol_selection": "auto",
     "whitelist": [],
-    "blacklist": ["BUSD/USDT", "USDC/USDT"],
-    "top_volume_count": 100
+    "blacklist": ["BUSD/USDT", "USDC/USDT", "USDT/USDT", "DAI/USDT"],
+    "top_volume_count": 50
   },
   "tax": {
     "enabled": true,
