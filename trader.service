@@ -4,11 +4,11 @@ After=network.target
 
 [Service]
 Type=simple
-User=pi
-WorkingDirectory=/home/pi/trader-pi
+User=sebachowa
+WorkingDirectory=/home/sebachowa/code/pi-trader
 Environment="PATH=/usr/local/bin:/usr/bin:/bin"
-Environment="PYTHONPATH=/home/pi/trader-pi"
-ExecStart=/usr/bin/python3 /home/pi/trader-pi/run.py --log-level INFO
+Environment="PYTHONPATH=/home/sebachowa/code/pi-trader"
+ExecStart=/home/sebachowa/code/pi-trader/venv/bin/python /home/sebachowa/code/pi-trader/run.py --log-level INFO
 Restart=always
 RestartSec=30
 
@@ -21,7 +21,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/home/pi/trader-pi/logs
+ReadWritePaths=/home/sebachowa/code/pi-trader/logs
 
 # Logging
 StandardOutput=journal

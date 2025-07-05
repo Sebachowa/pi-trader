@@ -8,8 +8,8 @@ set -e
 
 # Configuration
 PI_HOST=${1:-"raspberrypi.local"}
-PI_USER=${2:-"pi"}
-REMOTE_DIR="/home/${PI_USER}/trader-pi"
+PI_USER=${2:-"sebachowa"}
+REMOTE_DIR="/home/${PI_USER}/code/pi-trader"
 SERVICE_NAME="trader"
 
 echo "======================================="

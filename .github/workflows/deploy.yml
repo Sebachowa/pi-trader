@@ -18,14 +18,19 @@ jobs:
           key: ${{ secrets.PI_SSH_KEY }}
           script: |
             # Update code
-            cd ~/trader
+            cd ~/code/pi-trader
             git pull origin main
+            
+            # Create venv if doesn't exist
+            if [ ! -d "venv" ]; then
+              python3 -m venv venv
+            fi
             
             # Install dependencies
             source venv/bin/activate
             pip install -r requirements-pi.txt
             
             # Restart bot
-            sudo systemctl restart trader
+            sudo systemctl restart trader || echo "Service not yet configured"
             
             echo "✅ Deployed!"
