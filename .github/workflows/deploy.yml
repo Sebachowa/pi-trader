@@ -10,14 +10,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Deploy to Pi
-        uses: appleboy/ssh-action@v0.1.5
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v2
         with:
-          host: ${{ secrets.PI_HOST }}
-          username: ${{ secrets.PI_USER }}
-          key: ${{ secrets.PI_SSH_KEY }}
-          script: |
-            # Update code
+          oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_OAUTH_SECRET }}
+          tags: tag:github-actions
+      
+      - name: Deploy to Pi
+        run: |
+          # Now we're in the Tailscale network!
+          ssh -o StrictHostKeyChecking=no sebachowa@100.107.63.44 << 'EOF'
             cd ~/code/pi-trader
             git pull origin main
             
@@ -34,3 +37,4 @@ jobs:
             sudo systemctl restart trader || echo "Service not yet configured"
             
             echo "✅ Deployed!"
+          EOF
